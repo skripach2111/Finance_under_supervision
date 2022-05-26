@@ -3,8 +3,10 @@
 
 #include <QQmlApplicationEngine>
 
+#include "core.h"
+
 // uncomment this line to add the Live Client Module and use live reloading with your custom C++ code
-//#include <FelgoLiveClient>
+#include <FelgoLiveClient>
 
 int main(int argc, char *argv[])
 {
@@ -12,6 +14,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     FelgoApplication felgo;
+    Core* core = new Core();
 
     // Use platform-specific fonts instead of Felgo's default font
     felgo.setPreservePlatformFonts(true);
