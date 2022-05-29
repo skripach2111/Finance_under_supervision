@@ -1,23 +1,23 @@
-#include "notebookmodel.h"
+#include "labelmodel.h"
 
-NotebookModel::NotebookModel(QObject *parent) : QAbstractTableModel(parent)
+LabelModel::LabelModel(QObject *parent) : QAbstractTableModel(parent)
 {
 
 }
 
-int NotebookModel::rowCount( const QModelIndex& parent ) const
+int LabelModel::rowCount( const QModelIndex& parent ) const
 {
     Q_UNUSED( parent )
     return model.count();
 }
 
-int NotebookModel::columnCount( const QModelIndex& parent ) const
+int LabelModel::columnCount( const QModelIndex& parent ) const
 {
     Q_UNUSED( parent )
     return LAST;
 }
 
-QVariant NotebookModel::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant LabelModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
     if( role != Qt::DisplayRole ) {
         return QVariant();
@@ -32,12 +32,18 @@ QVariant NotebookModel::headerData( int section, Qt::Orientation orientation, in
         return "ID";
     case TITLE:
         return "Название";
+    case COLOR:
+        return "Цвет";
+    case ID_NOTEBOOK:
+        return "ID_NOTEBOOK";
+    case FLAG:
+        return "FLAG";
     }
 
     return QVariant();
 }
 
-QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
+QVariant LabelModel::data( const QModelIndex& index, int role ) const {
     if(!index.isValid())
         return QVariant();
 
@@ -51,6 +57,18 @@ QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
     {
         return model[ index.row() ][ TITLE ];
     }
+    case _COLOR:
+    {
+        return model[ index.row() ][ COLOR ];
+    }
+    case _ID_NOTEBOOK:
+    {
+        return model[ index.row() ][ ID_NOTEBOOK ];
+    }
+    case _FLAG:
+    {
+        return model[ index.row() ][ FLAG ];
+    }
     default:
     {
         return QVariant();
@@ -58,16 +76,19 @@ QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
     }
 }
 
-Qt::ItemFlags NotebookModel::flags( const QModelIndex& index ) const {
+Qt::ItemFlags LabelModel::flags( const QModelIndex& index ) const {
     Qt::ItemFlags flags = QAbstractTableModel::flags( index );
 
 
     return flags;
 }
 
-void NotebookModel::appendRow( const QString& title ) {
+void LabelModel::appendRow( const QString& title, const QString& color, const int& idNotebook, const bool& flag ) {
     DataHash record;
     record[ TITLE ] = title;
+    record[ COLOR ] = color;
+    record[ ID_NOTEBOOK ] = idNotebook;
+    record[ FLAG ] = flag;
     record[ STATE_ROW ] = (int)StatesRows::ADDED;
 
     int row = model.count();
@@ -76,22 +97,25 @@ void NotebookModel::appendRow( const QString& title ) {
     endInsertRows();
 }
 
-void NotebookModel::updateRow(int row, const QString& title)
+void LabelModel::updateRow( int row, const QString& title, const QString& color, const int& idNotebook, const bool& flag )
 {
     beginResetModel();
 
     model[ row ][ TITLE ] = title;
+    model[ row ][ COLOR ] = color;
+    model[ row ][ ID_NOTEBOOK ] = idNotebook;
+    model[ row ][ FLAG ] = flag;
     model[ row ][ STATE_ROW ] = (int)StatesRows::EDITED;
 
     endResetModel();
 }
 
-void NotebookModel::removeRow(int row)
+void LabelModel::removeRow(int row)
 {
     model[ row ][ STATE_ROW ] = StatesRows::DELETED;
 }
 
-bool NotebookModel::select()
+bool LabelModel::select()
 {
     beginResetModel();
     beginRemoveRows(createIndex(0, 0), 0, model.count());
@@ -111,6 +135,9 @@ bool NotebookModel::select()
         {
             record[ ID ] = query.value( ID );
             record[ TITLE ] = query.value( TITLE );
+            record[ COLOR ] = query.value( COLOR );
+            record[ ID_NOTEBOOK ] = query.value( ID_NOTEBOOK );
+            record[ FLAG ] = query.value( FLAG );
             record[ STATE_ROW ] = StatesRows::NOT_EDITED;
 
             model.append( record );
@@ -126,7 +153,7 @@ bool NotebookModel::select()
 }
 
 
-bool NotebookModel::saveChanges()
+bool LabelModel::saveChanges()
 {
     for(int i = 0; i < model.size(); i++)
     {
@@ -136,16 +163,22 @@ bool NotebookModel::saveChanges()
             if(model[ i ][ STATE_ROW ] == StatesRows::ADDED)
             {
                 qDebug() << "ADDED";
-                query.prepare(QString("INSERT INTO %1 (title) VALUES (:title)").arg(table));
+                query.prepare(QString("INSERT INTO %1 (title, color, idNotebook, flag) VALUES (:title, :color, :idNotebook, :flag)").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
+                query.bindValue(":color", model[ i ][ COLOR ]);
+                query.bindValue(":idNotebook", model[ i ][ ID_NOTEBOOK ]);
+                query.bindValue(":flag", model[ i ][ FLAG ]);
 
                 query.exec();
             }
             else if(model[ i ][ STATE_ROW ] == StatesRows::EDITED)
             {
                 qDebug() << "EDITED";
-                query.prepare(QString("UPDATE %1 SET title = :title WHERE id = :id").arg(table));
+                query.prepare(QString("UPDATE %1 SET title = :title, color = :color, idNotebook = :idNotebook, flag = :flag WHERE id = :id").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
+                query.bindValue(":color", model[ i ][ COLOR ]);
+                query.bindValue(":idNotebook", model[ i ][ ID_NOTEBOOK ]);
+                query.bindValue(":flag", model[ i ][ FLAG ]);
                 query.bindValue(":id", model[ i ][ ID ]);
 
                 query.exec();
@@ -166,13 +199,13 @@ bool NotebookModel::saveChanges()
     return true;
 }
 
-void NotebookModel::setTable(QString t, QSqlDatabase *database)
+void LabelModel::setTable(QString t, QSqlDatabase *database)
 {
     table = t;
     db = database;
 }
 
-QVariant NotebookModel::getDataById(int id, Column column)
+QVariant LabelModel::getDataById(int id, Column column)
 {
     for(int i = 0; i < model.size(); i++)
     {
@@ -183,7 +216,7 @@ QVariant NotebookModel::getDataById(int id, Column column)
     return QVariant();
 }
 
-bool NotebookModel::setData( const QModelIndex& index, const QVariant& value, int role ) {
+bool LabelModel::setData( const QModelIndex& index, const QVariant& value, int role ) {
     if( !index.isValid() || role != Qt::EditRole || model.count() <= index.row() ) {
         return false;
     }
@@ -194,11 +227,14 @@ bool NotebookModel::setData( const QModelIndex& index, const QVariant& value, in
     return true;
 }
 
-QHash<int, QByteArray> NotebookModel::roleNames() const
+QHash<int, QByteArray> LabelModel::roleNames() const
 {
     QHash<int, QByteArray> roles = QAbstractTableModel::roleNames();
     roles[_ID] = "_id";
     roles[_TITLE] = "_title";
+    roles[_COLOR] = "_color";
+    roles[_ID_NOTEBOOK] = "_id_notebook";
+    roles[_FLAG] = "_flag";
 
     return roles;
 }

@@ -36,9 +36,10 @@ ResultQuery DatabaseModule::connect()
 
     if(db.open())
     {
-        notebookModel.setTable("notebook");
-        notebookModel.select();
-        qDebug() << &notebookModel;
+        notebookModel = new NotebookModel(this);
+        notebookModel->select();
+        groupModel = new GroupModel(this);
+        groupModel->select();
         return ResultQuery(true);
     }
 

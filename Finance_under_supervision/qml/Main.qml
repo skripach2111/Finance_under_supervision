@@ -21,6 +21,7 @@ App {
         onComingNotebookModel: {
 
             list.model = notebookModel
+
         }
     }
 
@@ -31,7 +32,8 @@ App {
             id: list
 
             delegate: AppListItem {
-                text: "1"
+                text: id
+                detailText: title
             }
 
             Component.onCompleted: core.getNotebookModel()

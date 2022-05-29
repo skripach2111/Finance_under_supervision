@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
 
     FelgoApplication felgo;
-    //Core* core = new Core();
+    Core* core = new Core();
 
     qmlRegisterType<Core>("com.custom", 1, 0, "Core");
 

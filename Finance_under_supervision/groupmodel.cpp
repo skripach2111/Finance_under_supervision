@@ -1,23 +1,23 @@
-#include "notebookmodel.h"
+#include "groupmodel.h"
 
-NotebookModel::NotebookModel(QObject *parent) : QAbstractTableModel(parent)
+GroupModel::GroupModel(QObject *parent) : QAbstractTableModel(parent)
 {
 
 }
 
-int NotebookModel::rowCount( const QModelIndex& parent ) const
+int GroupModel::rowCount( const QModelIndex& parent ) const
 {
     Q_UNUSED( parent )
     return model.count();
 }
 
-int NotebookModel::columnCount( const QModelIndex& parent ) const
+int GroupModel::columnCount( const QModelIndex& parent ) const
 {
     Q_UNUSED( parent )
     return LAST;
 }
 
-QVariant NotebookModel::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant GroupModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
     if( role != Qt::DisplayRole ) {
         return QVariant();
@@ -32,12 +32,20 @@ QVariant NotebookModel::headerData( int section, Qt::Orientation orientation, in
         return "ID";
     case TITLE:
         return "Название";
+    case DESCRIPTION:
+        return "Описание";
+    case ICON:
+        return "Исонка";
+    case ID_NOTEBOOK:
+        return "ID_NOTEBOOK";
+    case FLAG:
+        return "FLAG";
     }
 
     return QVariant();
 }
 
-QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
+QVariant GroupModel::data( const QModelIndex& index, int role ) const {
     if(!index.isValid())
         return QVariant();
 
@@ -51,6 +59,22 @@ QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
     {
         return model[ index.row() ][ TITLE ];
     }
+    case _DESCRIPTION:
+    {
+        return model[ index.row() ][ DESCRIPTION ];
+    }
+    case _ICON:
+    {
+        return model[ index.row() ][ ICON ];
+    }
+    case _ID_NOTEBOOK:
+    {
+        return model[ index.row() ][ ID_NOTEBOOK ];
+    }
+    case _FLAG:
+    {
+        return model[ index.row() ][ FLAG ];
+    }
     default:
     {
         return QVariant();
@@ -58,16 +82,20 @@ QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
     }
 }
 
-Qt::ItemFlags NotebookModel::flags( const QModelIndex& index ) const {
+Qt::ItemFlags GroupModel::flags( const QModelIndex& index ) const {
     Qt::ItemFlags flags = QAbstractTableModel::flags( index );
 
 
     return flags;
 }
 
-void NotebookModel::appendRow( const QString& title ) {
+void GroupModel::appendRow( const QString& title, const QString& description, const QString& icon, const int& idNotebook, const bool& flag ) {
     DataHash record;
     record[ TITLE ] = title;
+    record[ DESCRIPTION ] = description;
+    record[ ICON ] = icon;
+    record[ ID_NOTEBOOK ] = idNotebook;
+    record[ FLAG ] = flag;
     record[ STATE_ROW ] = (int)StatesRows::ADDED;
 
     int row = model.count();
@@ -76,22 +104,26 @@ void NotebookModel::appendRow( const QString& title ) {
     endInsertRows();
 }
 
-void NotebookModel::updateRow(int row, const QString& title)
+void GroupModel::updateRow( int row, const QString& title, const QString& description, const QString& icon, const int& idNotebook, const bool& flag )
 {
     beginResetModel();
 
     model[ row ][ TITLE ] = title;
+    model[ row ][ DESCRIPTION ] = description;
+    model[ row ][ ICON ] = icon;
+    model[ row ][ ID_NOTEBOOK ] = idNotebook;
+    model[ row ][ FLAG ] = flag;
     model[ row ][ STATE_ROW ] = (int)StatesRows::EDITED;
 
     endResetModel();
 }
 
-void NotebookModel::removeRow(int row)
+void GroupModel::removeRow(int row)
 {
     model[ row ][ STATE_ROW ] = StatesRows::DELETED;
 }
 
-bool NotebookModel::select()
+bool GroupModel::select()
 {
     beginResetModel();
     beginRemoveRows(createIndex(0, 0), 0, model.count());
@@ -111,6 +143,10 @@ bool NotebookModel::select()
         {
             record[ ID ] = query.value( ID );
             record[ TITLE ] = query.value( TITLE );
+            record[ DESCRIPTION ] = query.value( DESCRIPTION );
+            record[ ICON ] = query.value( ICON );
+            record[ ID_NOTEBOOK ] = query.value( ID_NOTEBOOK );
+            record[ FLAG ] = query.value( FLAG );
             record[ STATE_ROW ] = StatesRows::NOT_EDITED;
 
             model.append( record );
@@ -126,7 +162,7 @@ bool NotebookModel::select()
 }
 
 
-bool NotebookModel::saveChanges()
+bool GroupModel::saveChanges()
 {
     for(int i = 0; i < model.size(); i++)
     {
@@ -136,16 +172,24 @@ bool NotebookModel::saveChanges()
             if(model[ i ][ STATE_ROW ] == StatesRows::ADDED)
             {
                 qDebug() << "ADDED";
-                query.prepare(QString("INSERT INTO %1 (title) VALUES (:title)").arg(table));
+                query.prepare(QString("INSERT INTO %1 (title, description, icon, idNotebook, flag) VALUES (:title, :description, :icon, :idNotebook, :flag)").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
+                query.bindValue(":description", model[ i ][ DESCRIPTION ]);
+                query.bindValue(":icon", model[ i ][ ICON ]);
+                query.bindValue(":idNotebook", model[ i ][ ID_NOTEBOOK ]);
+                query.bindValue(":flag", model[ i ][ FLAG ]);
 
                 query.exec();
             }
             else if(model[ i ][ STATE_ROW ] == StatesRows::EDITED)
             {
                 qDebug() << "EDITED";
-                query.prepare(QString("UPDATE %1 SET title = :title WHERE id = :id").arg(table));
+                query.prepare(QString("UPDATE %1 SET title = :title, description = :description, icon = :icon, idNotebook = :idNotebook, flag = :flag WHERE id = :id").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
+                query.bindValue(":description", model[ i ][ DESCRIPTION ]);
+                query.bindValue(":icon", model[ i ][ ICON ]);
+                query.bindValue(":idNotebook", model[ i ][ ID_NOTEBOOK ]);
+                query.bindValue(":flag", model[ i ][ FLAG ]);
                 query.bindValue(":id", model[ i ][ ID ]);
 
                 query.exec();
@@ -166,13 +210,13 @@ bool NotebookModel::saveChanges()
     return true;
 }
 
-void NotebookModel::setTable(QString t, QSqlDatabase *database)
+void GroupModel::setTable(QString t, QSqlDatabase *database)
 {
     table = t;
     db = database;
 }
 
-QVariant NotebookModel::getDataById(int id, Column column)
+QVariant GroupModel::getDataById(int id, Column column)
 {
     for(int i = 0; i < model.size(); i++)
     {
@@ -183,7 +227,7 @@ QVariant NotebookModel::getDataById(int id, Column column)
     return QVariant();
 }
 
-bool NotebookModel::setData( const QModelIndex& index, const QVariant& value, int role ) {
+bool GroupModel::setData( const QModelIndex& index, const QVariant& value, int role ) {
     if( !index.isValid() || role != Qt::EditRole || model.count() <= index.row() ) {
         return false;
     }
@@ -194,11 +238,15 @@ bool NotebookModel::setData( const QModelIndex& index, const QVariant& value, in
     return true;
 }
 
-QHash<int, QByteArray> NotebookModel::roleNames() const
+QHash<int, QByteArray> GroupModel::roleNames() const
 {
     QHash<int, QByteArray> roles = QAbstractTableModel::roleNames();
     roles[_ID] = "_id";
     roles[_TITLE] = "_title";
+    roles[_DESCRIPTION] = "_description";
+    roles[_ICON] = "_icon";
+    roles[_ID_NOTEBOOK] = "_id_notebook";
+    roles[_FLAG] = "_flag";
 
     return roles;
 }

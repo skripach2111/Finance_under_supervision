@@ -18,7 +18,7 @@ public:
     Q_INVOKABLE void getNotebookModel();
 
 signals:
-    void comingNotebookModel(QSqlTableModel& notebookModel);
+    void comingNotebookModel(NotebookModel* notebookModel);
 };
 
 #endif // CORE_H

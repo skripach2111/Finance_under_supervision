@@ -41,7 +41,10 @@ DEPLOYMENTFOLDERS += assetsFolder
 SOURCES += main.cpp \
     core.cpp \
     databasemodule.cpp \
+    groupmodel.cpp \
+    labelmodel.cpp \
     notebookmodel.cpp \
+    notemodel.cpp \
     resultquery.cpp
 
 
@@ -66,5 +69,8 @@ macx {
 HEADERS += \
     core.h \
     databasemodule.h \
+    groupmodel.h \
+    labelmodel.h \
     notebookmodel.h \
+    notemodel.h \
     resultquery.h

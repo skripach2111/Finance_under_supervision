@@ -1,5 +1,6 @@
-#ifndef NOTEBOOKMODEL_H
-#define NOTEBOOKMODEL_H
+#ifndef LABELMODEL_H
+#define LABELMODEL_H
+
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -8,12 +9,12 @@
 #include <QObject>
 #include <QDebug>
 
-class NotebookModel : public QAbstractTableModel
+class LabelModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    explicit NotebookModel(QObject *parent = nullptr);
+    explicit LabelModel(QObject *parent = nullptr);
 
     int rowCount( const QModelIndex& parent ) const;
     int columnCount( const QModelIndex& parent ) const;
@@ -23,8 +24,8 @@ public:
     Qt::ItemFlags flags( const QModelIndex& index ) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
-    void appendRow( const QString& title );
-    void updateRow( int row, const QString& title );
+    void appendRow( const QString& title, const QString& color, const int& idNotebook, const bool& flag );
+    void updateRow( int row, const QString& title, const QString& color, const int& idNotebook, const bool& flag );
     void removeRow(int row);
 
     bool select();
@@ -34,6 +35,9 @@ public:
     enum Column {
         ID = 0,
         TITLE,
+        COLOR,
+        ID_NOTEBOOK,
+        FLAG,
         LAST,
         STATE_ROW
     };
@@ -41,6 +45,9 @@ public:
     enum Role {
         _ID = Qt::UserRole + 1,
         _TITLE,
+        _COLOR,
+        _ID_NOTEBOOK,
+        _FLAG,
         _LAST,
         _STATE_ROW
     };
@@ -63,7 +70,7 @@ private:
     QSqlDatabase *db;
     QSqlQuery query;
 
-    QString table = "notebook";
+    QString table = "label";
 };
 
-#endif // NOTEBOOKMODEL_H
+#endif // LABELMODEL_H

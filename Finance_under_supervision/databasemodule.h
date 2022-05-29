@@ -4,8 +4,12 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QSqlTableModel>
+#include <QSqlQuery>
 #include <QString>
 #include <QDebug>
+
+#include "notebookmodel.h"
+#include "groupmodel.h"
 
 #include "resultquery.h"
 
@@ -14,6 +18,7 @@ class DatabaseModule : public QObject
     Q_OBJECT
 
     QSqlDatabase db;
+
 public:
     DatabaseModule(QObject *parent = nullptr);
     DatabaseModule(QString dbName, QObject *parent = nullptr);
@@ -27,7 +32,8 @@ public:
 
     void disconnect();
 
-    QSqlTableModel notebookModel;
+    NotebookModel* notebookModel;
+    GroupModel* groupModel;
 };
 
 #endif // DATABASEMODULE_H

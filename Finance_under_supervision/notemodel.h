@@ -1,5 +1,6 @@
-#ifndef NOTEBOOKMODEL_H
-#define NOTEBOOKMODEL_H
+#ifndef NOTEMODEL_H
+#define NOTEMODEL_H
+
 
 #include <QSqlDatabase>
 #include <QSqlQuery>
@@ -8,12 +9,12 @@
 #include <QObject>
 #include <QDebug>
 
-class NotebookModel : public QAbstractTableModel
+class NoteModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    explicit NotebookModel(QObject *parent = nullptr);
+    explicit NoteModel(QObject *parent = nullptr);
 
     int rowCount( const QModelIndex& parent ) const;
     int columnCount( const QModelIndex& parent ) const;
@@ -23,8 +24,8 @@ public:
     Qt::ItemFlags flags( const QModelIndex& index ) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
-    void appendRow( const QString& title );
-    void updateRow( int row, const QString& title );
+    void appendRow( const QString& title, const QString& description, const QDate& date, const int& idGroup );
+    void updateRow( int row, const QString& title, const QString& description, const QDate& date, const int& idGroup );
     void removeRow(int row);
 
     bool select();
@@ -34,6 +35,9 @@ public:
     enum Column {
         ID = 0,
         TITLE,
+        DATE,
+        DESCRIPTION,
+        ID_GROUP,
         LAST,
         STATE_ROW
     };
@@ -41,6 +45,9 @@ public:
     enum Role {
         _ID = Qt::UserRole + 1,
         _TITLE,
+        _DESCRIPTION,
+        _DATE,
+        _ID_GROUP,
         _LAST,
         _STATE_ROW
     };
@@ -63,7 +70,7 @@ private:
     QSqlDatabase *db;
     QSqlQuery query;
 
-    QString table = "notebook";
+    QString table = "note";
 };
 
-#endif // NOTEBOOKMODEL_H
+#endif // NOTEMODEL_H

@@ -1,23 +1,24 @@
-#include "notebookmodel.h"
+#include "notemodel.h"
 
-NotebookModel::NotebookModel(QObject *parent) : QAbstractTableModel(parent)
+
+NoteModel::NoteModel(QObject *parent) : QAbstractTableModel(parent)
 {
 
 }
 
-int NotebookModel::rowCount( const QModelIndex& parent ) const
+int NoteModel::rowCount( const QModelIndex& parent ) const
 {
     Q_UNUSED( parent )
     return model.count();
 }
 
-int NotebookModel::columnCount( const QModelIndex& parent ) const
+int NoteModel::columnCount( const QModelIndex& parent ) const
 {
     Q_UNUSED( parent )
     return LAST;
 }
 
-QVariant NotebookModel::headerData( int section, Qt::Orientation orientation, int role ) const
+QVariant NoteModel::headerData( int section, Qt::Orientation orientation, int role ) const
 {
     if( role != Qt::DisplayRole ) {
         return QVariant();
@@ -32,12 +33,18 @@ QVariant NotebookModel::headerData( int section, Qt::Orientation orientation, in
         return "ID";
     case TITLE:
         return "Название";
+    case DESCRIPTION:
+        return "Описание";
+    case DATE:
+        return "Дата";
+    case ID_GROUP:
+        return "Название";
     }
 
     return QVariant();
 }
 
-QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
+QVariant NoteModel::data( const QModelIndex& index, int role ) const {
     if(!index.isValid())
         return QVariant();
 
@@ -51,6 +58,18 @@ QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
     {
         return model[ index.row() ][ TITLE ];
     }
+    case _DESCRIPTION:
+    {
+        return model[ index.row() ][ DESCRIPTION ];
+    }
+    case _DATE:
+    {
+        return model[ index.row() ][ DATE ];
+    }
+    case _ID_GROUP:
+    {
+        return model[ index.row() ][ ID_GROUP ];
+    }
     default:
     {
         return QVariant();
@@ -58,16 +77,19 @@ QVariant NotebookModel::data( const QModelIndex& index, int role ) const {
     }
 }
 
-Qt::ItemFlags NotebookModel::flags( const QModelIndex& index ) const {
+Qt::ItemFlags NoteModel::flags( const QModelIndex& index ) const {
     Qt::ItemFlags flags = QAbstractTableModel::flags( index );
 
 
     return flags;
 }
 
-void NotebookModel::appendRow( const QString& title ) {
+void NoteModel::appendRow( const QString& title, const QString& description, const QDate& date, const int& idGroup ) {
     DataHash record;
     record[ TITLE ] = title;
+    record[ DESCRIPTION ] = description;
+    record[ DATE ] = date;
+    record[ ID_GROUP ] = idGroup;
     record[ STATE_ROW ] = (int)StatesRows::ADDED;
 
     int row = model.count();
@@ -76,22 +98,25 @@ void NotebookModel::appendRow( const QString& title ) {
     endInsertRows();
 }
 
-void NotebookModel::updateRow(int row, const QString& title)
+void NoteModel::updateRow( int row, const QString& title, const QString& description, const QDate& date, const int& idGroup )
 {
     beginResetModel();
 
     model[ row ][ TITLE ] = title;
+    model[ row ][ DESCRIPTION ] = description;
+    model[ row ][ DATE ] = date;
+    model[ row ][ ID_GROUP ] = idGroup;
     model[ row ][ STATE_ROW ] = (int)StatesRows::EDITED;
 
     endResetModel();
 }
 
-void NotebookModel::removeRow(int row)
+void NoteModel::removeRow(int row)
 {
     model[ row ][ STATE_ROW ] = StatesRows::DELETED;
 }
 
-bool NotebookModel::select()
+bool NoteModel::select()
 {
     beginResetModel();
     beginRemoveRows(createIndex(0, 0), 0, model.count());
@@ -111,6 +136,9 @@ bool NotebookModel::select()
         {
             record[ ID ] = query.value( ID );
             record[ TITLE ] = query.value( TITLE );
+            record[ DESCRIPTION ] = query.value( DESCRIPTION );
+            record[ DATE ] = query.value( DATE );
+            record[ ID_GROUP ] = query.value( ID_GROUP );
             record[ STATE_ROW ] = StatesRows::NOT_EDITED;
 
             model.append( record );
@@ -126,7 +154,7 @@ bool NotebookModel::select()
 }
 
 
-bool NotebookModel::saveChanges()
+bool NoteModel::saveChanges()
 {
     for(int i = 0; i < model.size(); i++)
     {
@@ -136,16 +164,22 @@ bool NotebookModel::saveChanges()
             if(model[ i ][ STATE_ROW ] == StatesRows::ADDED)
             {
                 qDebug() << "ADDED";
-                query.prepare(QString("INSERT INTO %1 (title) VALUES (:title)").arg(table));
+                query.prepare(QString("INSERT INTO %1 (title, description, date, idGroup) VALUES (:title, :description, :date, :idGroup)").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
+                query.bindValue(":description", model[ i ][ DESCRIPTION ]);
+                query.bindValue(":date", model[ i ][ DATE ]);
+                query.bindValue(":idGroup", model[ i ][ ID_GROUP ]);
 
                 query.exec();
             }
             else if(model[ i ][ STATE_ROW ] == StatesRows::EDITED)
             {
                 qDebug() << "EDITED";
-                query.prepare(QString("UPDATE %1 SET title = :title WHERE id = :id").arg(table));
+                query.prepare(QString("UPDATE %1 SET title = :title, description = :description, date = :date, idGroup = :idGroup WHERE id = :id").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
+                query.bindValue(":description", model[ i ][ DESCRIPTION ]);
+                query.bindValue(":date", model[ i ][ DATE ]);
+                query.bindValue(":idGroup", model[ i ][ ID_GROUP ]);
                 query.bindValue(":id", model[ i ][ ID ]);
 
                 query.exec();
@@ -166,13 +200,13 @@ bool NotebookModel::saveChanges()
     return true;
 }
 
-void NotebookModel::setTable(QString t, QSqlDatabase *database)
+void NoteModel::setTable(QString t, QSqlDatabase *database)
 {
     table = t;
     db = database;
 }
 
-QVariant NotebookModel::getDataById(int id, Column column)
+QVariant NoteModel::getDataById(int id, Column column)
 {
     for(int i = 0; i < model.size(); i++)
     {
@@ -183,7 +217,7 @@ QVariant NotebookModel::getDataById(int id, Column column)
     return QVariant();
 }
 
-bool NotebookModel::setData( const QModelIndex& index, const QVariant& value, int role ) {
+bool NoteModel::setData( const QModelIndex& index, const QVariant& value, int role ) {
     if( !index.isValid() || role != Qt::EditRole || model.count() <= index.row() ) {
         return false;
     }
@@ -194,11 +228,14 @@ bool NotebookModel::setData( const QModelIndex& index, const QVariant& value, in
     return true;
 }
 
-QHash<int, QByteArray> NotebookModel::roleNames() const
+QHash<int, QByteArray> NoteModel::roleNames() const
 {
     QHash<int, QByteArray> roles = QAbstractTableModel::roleNames();
     roles[_ID] = "_id";
     roles[_TITLE] = "_title";
+    roles[_DESCRIPTION] = "_description";
+    roles[_DATE] = "_icon";
+    roles[_ID_GROUP] = "_id_group";
 
     return roles;
 }
