@@ -36,6 +36,9 @@ ResultQuery DatabaseModule::connect()
 
     if(db.open())
     {
+        notebookModel.setTable("notebook");
+        notebookModel.select();
+        qDebug() << &notebookModel;
         return ResultQuery(true);
     }
 
@@ -55,4 +58,9 @@ ResultQuery DatabaseModule::connect(QSqlDatabase db)
     this->db = db;
 
     return connect();
+}
+
+void DatabaseModule::disconnect()
+{
+    db.close();
 }

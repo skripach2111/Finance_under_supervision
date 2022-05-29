@@ -9,3 +9,8 @@ Core::Core(QObject *parent)
     else
         qDebug() << "Error connect to database!";
 }
+
+void Core::getNotebookModel()
+{
+    emit comingNotebookModel(db.notebookModel);
+}

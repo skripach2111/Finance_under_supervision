@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QSqlTableModel>
 #include <QString>
+#include <QDebug>
 
 #include "resultquery.h"
 
@@ -22,6 +24,10 @@ public:
     ResultQuery connect();
     ResultQuery connect(QString dbName);
     ResultQuery connect(QSqlDatabase db);
+
+    void disconnect();
+
+    QSqlTableModel notebookModel;
 };
 
 #endif // DATABASEMODULE_H
