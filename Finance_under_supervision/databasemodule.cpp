@@ -40,6 +40,10 @@ ResultQuery DatabaseModule::connect()
         notebookModel->select();
         groupModel = new GroupModel(this);
         groupModel->select();
+        noteModel = new NoteModel(this);
+        noteModel->select();
+        labelModel = new LabelModel(this);
+        labelModel->select();
         return ResultQuery(true);
     }
 

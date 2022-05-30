@@ -29,6 +29,7 @@ public:
     void removeRow(int row);
 
     bool select();
+    bool select(int idNotebook);
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
 
@@ -72,7 +73,7 @@ private:
     QSqlDatabase *db;
     QSqlQuery query;
 
-    QString table = "group";
+    QString table = "category";
 };
 
 #endif // GROUPMODEL_H

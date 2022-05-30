@@ -152,6 +152,44 @@ bool LabelModel::select()
     return false;
 }
 
+bool LabelModel::select(int idNotebook)
+{
+    beginResetModel();
+    beginRemoveRows(createIndex(0, 0), 0, model.count());
+    while(model.count() != 0)
+        model.removeFirst();
+    endRemoveRows();
+
+    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook").arg(table));
+    query.bindValue(":idNotebook", idNotebook);
+    query.exec();
+    if(query.next())
+    {
+        int row = model.count();
+        beginInsertRows( createIndex(0, 0), row, row+query.size()-1 );
+
+        DataHash record;
+        do
+        {
+            record[ ID ] = query.value( ID );
+            record[ TITLE ] = query.value( TITLE );
+            record[ COLOR ] = query.value( COLOR );
+            record[ ID_NOTEBOOK ] = query.value( ID_NOTEBOOK );
+            record[ FLAG ] = query.value( FLAG );
+            record[ STATE_ROW ] = StatesRows::NOT_EDITED;
+
+            model.append( record );
+
+        }while(query.next());
+
+        endInsertRows();
+    }
+
+    endResetModel();
+
+    return false;
+}
+
 
 bool LabelModel::saveChanges()
 {

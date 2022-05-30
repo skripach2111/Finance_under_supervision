@@ -29,6 +29,7 @@ public:
     void removeRow(int row);
 
     bool select();
+    bool select(int idNotebook);
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
 

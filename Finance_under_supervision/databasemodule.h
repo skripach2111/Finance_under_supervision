@@ -10,6 +10,8 @@
 
 #include "notebookmodel.h"
 #include "groupmodel.h"
+#include "notemodel.h"
+#include "labelmodel.h"
 
 #include "resultquery.h"
 
@@ -34,6 +36,8 @@ public:
 
     NotebookModel* notebookModel;
     GroupModel* groupModel;
+    NoteModel* noteModel;
+    LabelModel* labelModel;
 };
 
 #endif // DATABASEMODULE_H

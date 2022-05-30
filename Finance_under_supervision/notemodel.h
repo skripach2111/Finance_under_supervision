@@ -24,13 +24,16 @@ public:
     Qt::ItemFlags flags( const QModelIndex& index ) const;
     virtual QHash<int, QByteArray> roleNames() const;
 
-    void appendRow( const QString& title, const QString& description, const QDate& date, const int& idGroup );
-    void updateRow( int row, const QString& title, const QString& description, const QDate& date, const int& idGroup );
+    void appendRow( const QString& title, const QString& description, const QDate& date, const int& idGroup, const qreal& sum );
+    void updateRow( int row, const QString& title, const QString& description, const QDate& date, const int& idGroup, const qreal& sum );
     void removeRow(int row);
 
     bool select();
+    bool select(int idGroup);
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
+
+    qreal getTotalSumByGroupId(int id);
 
     enum Column {
         ID = 0,
@@ -38,6 +41,7 @@ public:
         DATE,
         DESCRIPTION,
         ID_GROUP,
+        SUM,
         LAST,
         STATE_ROW
     };
@@ -48,6 +52,7 @@ public:
         _DESCRIPTION,
         _DATE,
         _ID_GROUP,
+        _SUM,
         _LAST,
         _STATE_ROW
     };

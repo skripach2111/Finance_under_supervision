@@ -38,9 +38,10 @@ QVariant NoteModel::headerData( int section, Qt::Orientation orientation, int ro
     case DATE:
         return "Дата";
     case ID_GROUP:
-        return "Название";
+        return "ID_GROUP";
+    case SUM:
+        return "Сумма";
     }
-
     return QVariant();
 }
 
@@ -70,6 +71,10 @@ QVariant NoteModel::data( const QModelIndex& index, int role ) const {
     {
         return model[ index.row() ][ ID_GROUP ];
     }
+    case _SUM:
+    {
+        return model[ index.row() ][ SUM ];
+    }
     default:
     {
         return QVariant();
@@ -84,12 +89,13 @@ Qt::ItemFlags NoteModel::flags( const QModelIndex& index ) const {
     return flags;
 }
 
-void NoteModel::appendRow( const QString& title, const QString& description, const QDate& date, const int& idGroup ) {
+void NoteModel::appendRow( const QString& title, const QString& description, const QDate& date, const int& idGroup, const qreal& sum ) {
     DataHash record;
     record[ TITLE ] = title;
     record[ DESCRIPTION ] = description;
     record[ DATE ] = date;
     record[ ID_GROUP ] = idGroup;
+    record[ SUM ] = sum;
     record[ STATE_ROW ] = (int)StatesRows::ADDED;
 
     int row = model.count();
@@ -98,7 +104,7 @@ void NoteModel::appendRow( const QString& title, const QString& description, con
     endInsertRows();
 }
 
-void NoteModel::updateRow( int row, const QString& title, const QString& description, const QDate& date, const int& idGroup )
+void NoteModel::updateRow( int row, const QString& title, const QString& description, const QDate& date, const int& idGroup, const qreal& sum )
 {
     beginResetModel();
 
@@ -106,6 +112,7 @@ void NoteModel::updateRow( int row, const QString& title, const QString& descrip
     model[ row ][ DESCRIPTION ] = description;
     model[ row ][ DATE ] = date;
     model[ row ][ ID_GROUP ] = idGroup;
+    model[ row ][ SUM ] = sum;
     model[ row ][ STATE_ROW ] = (int)StatesRows::EDITED;
 
     endResetModel();
@@ -139,6 +146,46 @@ bool NoteModel::select()
             record[ DESCRIPTION ] = query.value( DESCRIPTION );
             record[ DATE ] = query.value( DATE );
             record[ ID_GROUP ] = query.value( ID_GROUP );
+            record[ SUM ] = query.value( SUM );
+            record[ STATE_ROW ] = StatesRows::NOT_EDITED;
+
+            model.append( record );
+
+        }while(query.next());
+
+        endInsertRows();
+    }
+
+    endResetModel();
+
+    return false;
+}
+
+bool NoteModel::select(int idGroup)
+{
+    beginResetModel();
+    beginRemoveRows(createIndex(0, 0), 0, model.count());
+    while(model.count() != 0)
+        model.removeFirst();
+    endRemoveRows();
+
+    query.prepare(QString("SELECT * FROM %1 WHERE idGroup = :idGroup").arg(table));
+    query.bindValue(":idGroup", idGroup);
+    query.exec();
+    if(query.next())
+    {
+        int row = model.count();
+        beginInsertRows( createIndex(0, 0), row, row+query.size()-1 );
+
+        DataHash record;
+        do
+        {
+            record[ ID ] = query.value( ID );
+            record[ TITLE ] = query.value( TITLE );
+            record[ DESCRIPTION ] = query.value( DESCRIPTION );
+            record[ DATE ] = query.value( DATE );
+            record[ ID_GROUP ] = query.value( ID_GROUP );
+            record[ SUM ] = query.value( SUM );
             record[ STATE_ROW ] = StatesRows::NOT_EDITED;
 
             model.append( record );
@@ -164,22 +211,24 @@ bool NoteModel::saveChanges()
             if(model[ i ][ STATE_ROW ] == StatesRows::ADDED)
             {
                 qDebug() << "ADDED";
-                query.prepare(QString("INSERT INTO %1 (title, description, date, idGroup) VALUES (:title, :description, :date, :idGroup)").arg(table));
+                query.prepare(QString("INSERT INTO %1 (title, description, date, idGroup, sum) VALUES (:title, :description, :date, :idGroup, :sum)").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
                 query.bindValue(":description", model[ i ][ DESCRIPTION ]);
                 query.bindValue(":date", model[ i ][ DATE ]);
                 query.bindValue(":idGroup", model[ i ][ ID_GROUP ]);
+                query.bindValue(":sum", model[ i ][ SUM ]);
 
                 query.exec();
             }
             else if(model[ i ][ STATE_ROW ] == StatesRows::EDITED)
             {
                 qDebug() << "EDITED";
-                query.prepare(QString("UPDATE %1 SET title = :title, description = :description, date = :date, idGroup = :idGroup WHERE id = :id").arg(table));
+                query.prepare(QString("UPDATE %1 SET title = :title, description = :description, date = :date, idGroup = :idGroup, sum = :sum WHERE id = :id").arg(table));
                 query.bindValue(":title", model[ i ][ TITLE ]);
                 query.bindValue(":description", model[ i ][ DESCRIPTION ]);
                 query.bindValue(":date", model[ i ][ DATE ]);
                 query.bindValue(":idGroup", model[ i ][ ID_GROUP ]);
+                query.bindValue(":sum", model[ i ][ SUM ]);
                 query.bindValue(":id", model[ i ][ ID ]);
 
                 query.exec();
@@ -204,6 +253,16 @@ void NoteModel::setTable(QString t, QSqlDatabase *database)
 {
     table = t;
     db = database;
+}
+
+qreal NoteModel::getTotalSumByGroupId(int id)
+{
+    qreal sum = 0;
+
+    for(int i = 0; i < model.length(); i++)
+        sum += model[ i ][ SUM ].toReal();
+
+    return sum;
 }
 
 QVariant NoteModel::getDataById(int id, Column column)
@@ -236,6 +295,7 @@ QHash<int, QByteArray> NoteModel::roleNames() const
     roles[_DESCRIPTION] = "_description";
     roles[_DATE] = "_icon";
     roles[_ID_GROUP] = "_id_group";
+    roles[_SUM] = "_sum";
 
     return roles;
 }
