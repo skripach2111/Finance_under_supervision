@@ -7,7 +7,7 @@ Item {
     height: 800
     width: 300
 
-    signal clickedContinue()
+    signal clickedContinue(var beginDate, var endDate)
 
     ColumnLayout {
         anchors.fill: parent
@@ -30,26 +30,13 @@ Item {
                     text: "Начальная дата:"
                 }
 
-                RowLayout {
-
-
+                DatePicker {
+                    id: startDate
                     width: parent.width
 
-                    AppText {
-                        property var dateBegin: new Date()
+                    datePickerMode: dateMode
 
-                        height: parent.height
 
-                        text: dateBegin.toLocaleDateString("dd-mm-yyyy")
-
-                        Layout.fillWidth: true
-                    }
-
-                    AppButton {
-                        height: parent.height
-
-                        text: "Выбрать"
-                    }
                 }
 
                 AppText {
@@ -58,27 +45,11 @@ Item {
                     text: "Конечная дата:"
                 }
 
-                RowLayout {
+                DatePicker {
+                    id: endDate
                     width: parent.width
 
-                    AppText {
-                        id: end
-                        property var dateEnd: new Date()
-
-                        height: parent.height
-
-                        text: dateEnd.toLocaleDateString("dd-mm-yyyy")
-
-                        Layout.fillWidth: true
-                    }
-
-                    AppButton {
-                        height: parent.height
-
-                        text: "Выбрать"
-
-                        onClicked: end.dateEnd =  nativeUtils.displayDatePicker("Pick your favorite date!")
-                    }
+                    datePickerMode: dateMode
                 }
             }
         }
@@ -94,7 +65,7 @@ Item {
             horizontalPadding: dp(0)
 
             onClicked: {
-                clickedContinue()
+                clickedContinue(startDate.selectedDate, endDate.selectedDate)
             }
         }
     }

@@ -41,9 +41,9 @@ Item {
     }
 
     property var icons: [
-        {icon: "../assets/icon_1.png", text: "icon_1"},
-        {icon: "../assets/icon_2.png", text: "icon_2"},
-        {icon: "../assets/icon_3.png", text: "icon_3"},
-        {icon: "../assets/icon_4.png", text: "icon_4"}
+        {icon: "../../assets/icon_1.png", text: "icon_1"},
+        {icon: "../../assets/icon_2.png", text: "icon_2"},
+        {icon: "../../assets/icon_3.png", text: "icon_3"},
+        {icon: "../../assets/icon_4.png", text: "icon_4"}
     ]
 }

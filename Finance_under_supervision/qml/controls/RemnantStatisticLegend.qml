@@ -34,14 +34,14 @@ Item {
                 width: parent.width
                 fontSize: root.fontSize
                 color: root.textColor
-                text: "Остаток: " + runStatisticsChart.totalValue
+                text: "Заработано: " + runStatisticsChart.totalValue
             }
 
             AppText {
                 width: parent.width
                 fontSize: root.fontSize
                 color: root.textColor
-                text: "Всего: " + (runStatisticsChart.totalValue + runStatisticsChart.value)
+                text: "Остаток: " + (runStatisticsChart.totalValue + runStatisticsChart.value)
             }
         }
     }

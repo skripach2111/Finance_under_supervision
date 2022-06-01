@@ -255,6 +255,26 @@ void GroupModel::setTable(QString t, QSqlDatabase *database)
     db = database;
 }
 
+QList <QString> GroupModel::getGroupTitleByIdNotebook(int idNotebook)
+{
+    QList <QString> tmpList;
+    for(int i = 0; i < model.size(); i++)
+        if(model[ i ][ ID_NOTEBOOK ].toInt() == idNotebook)
+            tmpList.append(model[ i ][ TITLE ].toString());
+
+    return tmpList;
+}
+
+QList<int> GroupModel::getGroupIdByIdNotebook(int idNotebook)
+{
+    QList <int> tmpList;
+    for(int i = 0; i < model.size(); i++)
+        if(model[ i ][ ID_NOTEBOOK ].toInt() == idNotebook)
+            tmpList.append(model[ i ][ ID ].toInt());
+
+    return tmpList;
+}
+
 QVariant GroupModel::getDataById(int id, Column column)
 {
     for(int i = 0; i < model.size(); i++)

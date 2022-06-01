@@ -30,8 +30,12 @@ public:
 
     bool select();
     bool select(int idNotebook);
+    bool select(int idNotebook, int idNote);
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
+
+    QList <QString> getTitleByNotebookId(int idNotebook);
+    QList <int> getIdBaNotebookId(int idNotebook);
 
     enum Column {
         ID = 0,

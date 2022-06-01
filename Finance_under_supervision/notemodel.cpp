@@ -260,7 +260,19 @@ qreal NoteModel::getTotalSumByGroupId(int id)
     qreal sum = 0;
 
     for(int i = 0; i < model.length(); i++)
-        sum += model[ i ][ SUM ].toReal();
+        if(model[ i ][ ID_GROUP ] == id)
+            sum += model[ i ][ SUM ].toReal();
+
+    return sum;
+}
+
+qreal NoteModel::getTotalSumByGroupIdAndDate(int idGroup, QDate dateBegin, QDate dateEnd)
+{
+    qreal sum = 0;
+
+    for(int i = 0; i < model.length(); i++)
+        if(model[ i ][ ID_GROUP ] == idGroup && model[ i ][ DATE ].toDate() > dateBegin && model[ i ][ DATE ].toDate() < dateEnd && model[ i ][ SUM ].toReal() <= 0)
+             sum += model[ i ][ SUM ].toReal();
 
     return sum;
 }

@@ -9,8 +9,8 @@ Page {
     height: 800
     width: 300
 
-    property ListModel notes: ListModel {}
-    property ListModel labels: ListModel {}
+    property var notes
+    property var labels
     property int idNote: 0
 
     rightBarItem: TextButtonBarItem {
@@ -43,7 +43,7 @@ Page {
 
                             anchors.centerIn: parent
 
-                            source: notes.get(idNote).icon
+                            source: core.getGroupIconById(core.getNoteGroupById(core.currentNote))
                         }
                     }
 
@@ -61,7 +61,7 @@ Page {
 
                                 width: parent.width
 
-                                text: notes.get(idNote).title
+                                text: core.getNoteTitleById(core.currentNote)
                                 color: Theme.colors.backgroundColor
                             }
 
@@ -70,7 +70,7 @@ Page {
 
                                 width: parent.width
 
-                                text: notes.get(idNote).group_title
+                                text: core.getGroupTitleById(core.getNoteGroupById(core.currentNote))
                                 color: Theme.colors.backgroundColor
                             }
 
@@ -79,7 +79,7 @@ Page {
 
                                 width: parent.width
 
-                                text: notes.get(idNote).sum
+                                text: core.getNoteSumById(core.currentNote)
                                 color: Theme.colors.backgroundColor
                             }
 
@@ -88,7 +88,7 @@ Page {
 
                                 width: parent.width
 
-                                text: notes.get(idNote).date
+                                text: core.getNoteDateById(core.currentNote)
                                 color: Theme.colors.backgroundColor
                             }
                         }
@@ -104,7 +104,7 @@ Page {
                         anchors.margins: dp(5)
 
                         property var cHeight: dp(20)
-                        property var cWidth: dp(76)
+                        property var cWidth: dp(100)
 
                         cellHeight: cHeight
                         cellWidth: cWidth
@@ -113,7 +113,7 @@ Page {
 
                         delegate: AppPaper {
                             height: dp(16)
-                            width: dp(72)
+                            width: dp(90)
 
                             background.color: Theme.colors.tintLightColor
 
@@ -122,8 +122,8 @@ Page {
                             AppText {
                                 anchors.centerIn: parent
 
-                                text: title
-                                color: colored
+                                text: _title
+                                color: _color
                             }
                         }
                     }
@@ -153,24 +153,24 @@ Page {
 
                     AppText {
                         anchors.fill: parent
-                        text: notes.get(idNote).description
+                        text: core.getNoteDescriptionById(core.currentNote)
                     }
                 }
 
-                AppText {
-                    width: parent.width
+//                AppText {
+//                    width: parent.width
 
-                    text: "Дополнительно:"
-                }
+//                    text: "Дополнительно:"
+//                }
 
-                AppPaper {
-                    height: dp(300)
-                    width: parent.width
+//                AppPaper {
+//                    height: dp(300)
+//                    width: parent.width
 
-                    AppImage {
-                        anchors.fill: parent
-                    }
-                }
+//                    AppImage {
+//                        anchors.fill: parent
+//                    }
+//                }
             }
         }
     }

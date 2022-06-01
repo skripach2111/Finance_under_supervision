@@ -190,6 +190,45 @@ bool LabelModel::select(int idNotebook)
     return false;
 }
 
+bool LabelModel::select(int idNotebook, int idNote)
+{
+    beginResetModel();
+    beginRemoveRows(createIndex(0, 0), 0, model.count());
+    while(model.count() != 0)
+        model.removeFirst();
+    endRemoveRows();
+
+    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook AND id IN (SELECT idLabel FROM labels_in_note WHERE idNote = :idNote)").arg(table));
+    query.bindValue(":idNotebook", idNotebook);
+    query.bindValue(":idNote", idNote);
+    query.exec();
+    if(query.next())
+    {
+        int row = model.count();
+        beginInsertRows( createIndex(0, 0), row, row+query.size()-1 );
+
+        DataHash record;
+        do
+        {
+            record[ ID ] = query.value( ID );
+            record[ TITLE ] = query.value( TITLE );
+            record[ COLOR ] = query.value( COLOR );
+            record[ ID_NOTEBOOK ] = query.value( ID_NOTEBOOK );
+            record[ FLAG ] = query.value( FLAG );
+            record[ STATE_ROW ] = StatesRows::NOT_EDITED;
+
+            model.append( record );
+
+        }while(query.next());
+
+        endInsertRows();
+    }
+
+    endResetModel();
+
+    return false;
+}
+
 
 bool LabelModel::saveChanges()
 {
@@ -241,6 +280,26 @@ void LabelModel::setTable(QString t, QSqlDatabase *database)
 {
     table = t;
     db = database;
+}
+
+QList<QString> LabelModel::getTitleByNotebookId(int idNotebook)
+{
+    QList <QString> tmpList;
+    for(int i = 0; i < model.size(); i++)
+        if(model[ i ][ ID_NOTEBOOK ].toInt() == idNotebook)
+            tmpList.append(model[ i ][ TITLE ].toString());
+
+    return tmpList;
+}
+
+QList<int> LabelModel::getIdBaNotebookId(int idNotebook)
+{
+    QList <int> tmpList;
+    for(int i = 0; i < model.size(); i++)
+        if(model[ i ][ ID_NOTEBOOK ].toInt() == idNotebook)
+            tmpList.append(model[ i ][ ID ].toInt());
+
+    return tmpList;
 }
 
 QVariant LabelModel::getDataById(int id, Column column)

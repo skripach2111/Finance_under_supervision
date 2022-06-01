@@ -69,8 +69,8 @@ Item {
                         clip: true
                         model: root.groupModel
                         delegate: AppListItem {
-                            text: title
-                            detailText: description
+                            text: _title
+                            detailText: _description
 
                             mouseArea.onClicked: setGroup()
 
@@ -82,7 +82,7 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: dp(10)
 
-                                    source: "../assets/cross.png"
+                                    source: "../../assets/cross.png"
                                 }
 
                                 verticalMargin: dp(0)
@@ -180,7 +180,7 @@ Item {
                                     anchors.fill: parent
                                     anchors.margins: dp(10)
 
-                                    source: "../assets/cross.png"
+                                    source: "../../assets/cross.png"
                                 }
 
                                 verticalMargin: dp(0)

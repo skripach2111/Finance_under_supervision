@@ -22,6 +22,8 @@ App {
 
     Core {
         id: core
+
+
     }
 
     NavigationStack {
@@ -39,9 +41,11 @@ App {
 
                 onClickedAdd: startNavStack.push(addNotebook)
                 onClickedOpen: {
+                    core.currentNotebook = idNotebook
+                    core.getTotalPlus(core.currentNotebook)
+                    core.getTotalMinus(core.currentNotebook)
                     startNavStack.visible = false
                     mainNavStack.visible = true
-                    core.currentNotebook = idNotebook
                 }
             }
         }
@@ -55,8 +59,8 @@ App {
                 ContentAddNotebook {
                     anchors.fill: parent
 
-                    groupModel: models.groups
-                    labelsModel: models.labels
+                    groupModel: core.groupModel
+                    labelsModel: core.labelModel
 
                     onClickedSave: {
                         models.notebook.append(newNotebook)
@@ -142,18 +146,32 @@ App {
                 id: navStackMainPage
 
                 Page {
+                    id: mainaNavePage
                     title: "Главная"
+
+                    function setChart()
+                        {
+                        mainPage.setChart()
+                    }
 
                     ContentMainPage {
                         id: mainPage
                         anchors.fill: parent
 
                         groups: core.groupModel
-                        labels: models.labelModel
-                        notes: models.noteModel
+                        labels: core.labelModel
+                        notes: core.noteModel
 
-                        onClickedNotes: navStackMainPage.push(infoNote)
-                        onClickedGroup: navStackMainPage.push(listNotes)
+                        onClickedNotes: {
+                            core.currentNote = idNote
+                            navStackMainPage.push(infoNote)
+                        }
+                        onClickedGroup: {
+                            core.currentGroup = idGroup
+                            navStackMainPage.push(listNotes)
+                        }
+
+
 
                     }
 
@@ -190,8 +208,8 @@ App {
                         ContentAddNote {
                             anchors.fill: parent
 
-                            groupModel: models.groups
-                            labelModel: models.labels
+                            groupModel: core.groupModel
+                            labelModel: core.labelModel
                         }
                     }
                 }
@@ -205,8 +223,8 @@ App {
                         ContentInfoNote {
                             anchors.fill: parent
 
-                            notes: models.notes
-                            labels: models.labels
+                            notes: core.noteModel
+                            labels: core.labelModel
                         }
                     }
                 }
@@ -227,10 +245,13 @@ App {
                         PageListNotes {
                             anchors.fill: parent
 
-                            notes: models.notes
-                            labels: models.labels
+                            notes: core.noteModel
+                            labels: core.labelModel
 
-                            onClickedNote: navStackMainPage.push(infoNote)
+                            onClickedNote: {
+                                core.currentNote = idNote
+                                navStackMainPage.push(infoNote)
+                            }
                         }
                     }
                 }
@@ -275,7 +296,11 @@ App {
                         ContentSelectGraphicsPage {
                             anchors.fill: parent
 
-                            onClickedContinue: navStackGraphics.push(navStackGraphics.selectGraphick)
+                            onClickedContinue: {
+                                core.beginDate = beginDate
+                                core.endDate = endDate
+                                navStackGraphics.push(navStackGraphics.selectGraphick)
+                            }
                         }
                     }
                 }
@@ -301,6 +326,9 @@ App {
 
                         ContentGraphicGroupPage {
                             anchors.fill: parent
+
+                            groups: core.getListGroupTitles(core.currentNotebook);
+                            plus: core.getListPlusByGroup(core.currentNotebook, core.beginDate, core.endDate)
                         }
                     }
                 }
@@ -339,7 +367,7 @@ App {
                         anchors.fill: parent
 
                         groupModel: core.groupModel
-                        labelsModel: models.labels
+                        labelsModel: core.labelModel
                         notebooksModel: core.notebookModel
                     }
                 }
@@ -353,8 +381,8 @@ App {
                         ContentAddNotebook {
                             anchors.fill: parent
 
-                            groupModel: models.groups
-                            labelsModel: models.labels
+                            groupModel: core.groupModel
+                            labelsModel: core.labelModel
 
                             onClickedAddGroup: navStackNotebook.push(addGroup)
                             onClickedAddLabel: navStackNotebook.push(addLabels)

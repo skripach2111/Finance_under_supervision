@@ -8,10 +8,10 @@ Page {
     height: 800
     width: 300
 
-    property ListModel notes: ListModel {}
-    property ListModel labels: ListModel {}
+    property var notes
+    property var labels
 
-    signal clickedNote()
+    signal clickedNote(var idNote)
 
     AppListView {
         clip: true
@@ -23,17 +23,17 @@ Page {
             leftItem: AppImage {
                 height: parent.height
                 width: height
-                source: icon
+                source: core.getGroupIconById(_id_group)
 
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            text: title
-            detailText: group_title
-            rightText: sum > 0 ? "+" + sum : sum
-            rightTextColor: sum > 0 ? "green" : "red"
+            text: _title
+            detailText: core.getGroupTitleById(_id_group)
+            rightText: _sum > 0 ? "+" + _sum : _sum
+            rightTextColor: _sum > 0 ? "green" : "red"
 
-            mouseArea.onClicked: clickedNote()
+            mouseArea.onClicked: clickedNote(_id)
         }
     }
 }

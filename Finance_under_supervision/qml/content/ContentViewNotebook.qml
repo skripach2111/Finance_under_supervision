@@ -10,9 +10,9 @@ Item {
     height: 800
     width: 300
 
-    property var currentNotebook: 0
+    property var currentNotebook
     property var groupModel
-    property var labelsModel: []
+    property var labelsModel
     property var notebooksModel
 
     AppFlickable {
@@ -27,7 +27,7 @@ Item {
 
             AppText {
                 width: parent.width
-                text: notebooksModel.getDataById(core.currentNotebook, 1)
+                text: core.getNotebookTitleById(core.currentNotebook)
                 fontSize: dp(30)
                 font.bold: true
             }
@@ -117,8 +117,8 @@ Item {
                         clip: true
                         model: root.labelsModel
                         delegate: AppListItem {
-                            text: title
-                            textColor: colored
+                            text: _title
+                            textColor: _color
 
                             mouseArea.onClicked: clickedOpen()
                         }

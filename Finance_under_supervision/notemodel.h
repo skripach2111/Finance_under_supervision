@@ -8,6 +8,7 @@
 #include <QAbstractTableModel>
 #include <QObject>
 #include <QDebug>
+#include <QDate>
 
 class NoteModel : public QAbstractTableModel
 {
@@ -33,13 +34,14 @@ public:
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
 
-    qreal getTotalSumByGroupId(int id);
+    qreal getTotalSumByGroupId(int idGroup);
+    qreal getTotalSumByGroupIdAndDate(int idGroup, QDate dateBegin, QDate dateEnd);
 
     enum Column {
         ID = 0,
         TITLE,
-        DATE,
         DESCRIPTION,
+        DATE,
         ID_GROUP,
         SUM,
         LAST,

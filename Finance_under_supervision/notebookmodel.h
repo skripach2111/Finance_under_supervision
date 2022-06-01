@@ -31,6 +31,9 @@ public:
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
 
+    qreal getTotalPlusById(int id);
+    qreal getTotalMinusById(int id);
+
     enum Column {
         ID = 0,
         TITLE,

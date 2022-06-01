@@ -33,6 +33,9 @@ public:
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
 
+    QList <QString> getGroupTitleByIdNotebook(int idNotebook);
+    QList <int> getGroupIdByIdNotebook(int idNotebook);
+
     enum Column {
         ID = 0,
         TITLE,

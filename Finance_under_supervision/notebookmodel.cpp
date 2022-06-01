@@ -172,6 +172,24 @@ void NotebookModel::setTable(QString t, QSqlDatabase *database)
     db = database;
 }
 
+qreal NotebookModel::getTotalPlusById(int id)
+{
+    query.prepare("SELECT SUM(sum) FROM note WHERE idGroup IN (SELECT id FROM category WHERE idNotebook = :idNotebook) AND sum > 0");
+    query.bindValue(":idNotebook", id);
+    query.exec();
+    query.next();
+    return query.value(0).toReal();
+}
+
+qreal NotebookModel::getTotalMinusById(int id)
+{
+    query.prepare("SELECT SUM(sum) FROM note WHERE idGroup IN (SELECT id FROM category WHERE idNotebook = :idNotebook) AND sum < 0");
+    query.bindValue(":idNotebook", id);
+    query.exec();
+    query.next();
+    return query.value(0).toReal();
+}
+
 QVariant NotebookModel::getDataById(int id, Column column)
 {
     for(int i = 0; i < model.size(); i++)

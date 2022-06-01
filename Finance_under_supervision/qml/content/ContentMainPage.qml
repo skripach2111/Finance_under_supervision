@@ -13,14 +13,28 @@ Item {
     width: 300
 
     property var groups
-    property ListModel icons: ListModel {}
-    property ListModel notes: ListModel {}
-    property ListModel labels: ListModel {}
+    property var icons
+    property var notes
+    property var labels
 
-    readonly property alias currentTav: tbControl.currentIndex
+    readonly property alias currentTab: tbControl.currentIndex
 
-    signal clickedNotes()
-    signal clickedGroup()
+    onCurrentTabChanged: {
+        if(currentTab == 1)
+            core.currentGroup = -1
+    }
+
+    signal clickedNotes(var idNote)
+    signal clickedGroup(var idGroup)
+
+    function setChart()
+    {
+        runStatisticsChart.value = core.getTotalMinus(core.currentNotebook)
+        runStatisticsChart.totalValue = core.getTotalPlus(core.currentNotebook) - core.getTotalMinus(core.currentNotebook)
+
+        runStatisticsLegend.value = runStatisticsChart.value
+        runStatisticsLegend.totalValue = runStatisticsChart.totalValue
+    }
 
     Column {
         anchors.fill: parent
@@ -41,8 +55,8 @@ Item {
                     height: parent.height
                     width: parent.height
 
-                    value: 2500
-                    totalValue: 640
+                    value: core.totalMinus
+                    totalValue: core.totalPlus
 
                     activity: "Остаток:"
                 }
@@ -53,8 +67,8 @@ Item {
                     height: parent.height
                     width: parent.width
 
-                    value: 2500
-                    totalValue: 640
+                    value: runStatisticsChart.value
+                    totalValue: runStatisticsChart.totalValue
                 }
 
             }
@@ -77,18 +91,18 @@ Item {
                             leftItem: AppImage {
                                 height: parent.height
                                 width: height
-                                source: icon
+                                source: _icon
 
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            property var _sum: 0
+                            property var _sum: core.getTotalSumByGroupId(_id)
                             text: _title
                             detailText: _description
                             rightText: _sum >= 0 ? "+" + _sum : _sum
                             rightTextColor: _sum >= 0 ? "green" : "red"
 
-                            mouseArea.onClicked: clickedGroup()
+                            mouseArea.onClicked: clickedGroup(_id)
                         }
                     }
                 }
@@ -101,7 +115,7 @@ Item {
                     notes: root.notes
                     labels: root.labels
 
-                    onClickedNote: clickedNotes()
+                    onClickedNote: clickedNotes(idNote)
                 }
             }
         }

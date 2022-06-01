@@ -6,8 +6,8 @@ import QtCharts 2.3
 Item {
     id: root
 
-    property real totalValue: 1
-    property real value: 0
+    property var totalValue
+    property var value
     property string activity: "Остаток:"
     property var backgroundColor: Theme.colors.tintLightColor
     property var textColor: Theme.secondaryBackgroundColor
@@ -40,7 +40,7 @@ Item {
 
 
                     PieSlice {
-                        value: root.totalValue - root.value
+                        value: root.totalValue
                         color: Theme.tintColor
 
                         Behavior on value {
@@ -75,7 +75,7 @@ Item {
                     font.pixelSize: dp(16)
                     font.bold: true
                     color: Theme.backgroundColor
-                    text: totalValue
+                    text: totalValue + value
                 }
             }
     }
