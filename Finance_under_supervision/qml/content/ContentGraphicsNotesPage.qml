@@ -8,10 +8,10 @@ Page {
     height: 800
     width: 300
 
-    readonly property var daysNumbers: ["1.11", "2.11", "3.11", "4.11"]
-    readonly property int daysCount: daysNumbers.length
-    readonly property var plus:  [200, 100, 0, 100]
-    readonly property var minus:  [0, 350, 980, 0]
+    property var daysNumbers
+    property int daysCount: daysNumbers.length
+    property var plus
+    property var minus
 
     property int minVal: 0
     property int maxVal: Math.max(...plus) > Math.max(...minus) ? Math.max(...plus) : Math.max(...minus)
@@ -21,35 +21,54 @@ Page {
     readonly property string plusTitle: "Доходы"
     readonly property string minusTitle: "Расходы"
 
-    ChartView {
+    Flickable {
         anchors.fill: parent
-        antialiasing: true
-        legend.alignment: Qt.AlignBottom
-        legend.visible: true
 
-        BarSeries {
-            labelsVisible: true
-            axisX: BarCategoryAxis {
-                categories: daysNumbers
-                titleText: "Число"
-            }
-            axisY: ValueAxis {
-                min: 0
-                max: maxVal
-                titleText: "Заработано/Потрачено"
-            }
+        contentWidth: chart.width
 
-            BarSet {
-                label: plusTitle
-                values: plus
-                color: plusColor
-            }
+            ChartView {
+                id: chart
+                height: parent.height
+                width: dp(100)*2*daysCount
 
-            BarSet {
-                label: minusTitle
-                values: minus
-                color: minusColor
+                antialiasing: true
+                legend.alignment: Qt.AlignBottom
+                legend.visible: true
+
+                BarSeries {
+                    id: bar
+                    labelsVisible: true
+                    axisX: BarCategoryAxis {
+                        categories: daysNumbers
+                        titleText: "Число"
+                    }
+                    axisY: ValueAxis {
+                        min: 0.0
+                        max: maxVal + maxVal*0.2
+                        titleText: "Заработано/Потрачено"
+                    }
+
+                    BarSet {
+                        label: plusTitle
+                        values: plus
+                        color: plusColor
+                    }
+
+                    BarSet {
+                        label: minusTitle
+                        values: minus
+                        color: minusColor
+                    }
+                }
             }
-        }
     }
+    //    AppButton {
+    //        onClicked: {
+    //            bar.append(plusTitle, core.getListTotalPlusByDate());
+    //            bar.at(bar.count-1).color = plusColor
+
+    //            bar.append(minusTitle, core.getListTotalMinusByDate());
+    //            bar.at(bar.count-1).color = minusColor
+    //        }
+    //    }
 }

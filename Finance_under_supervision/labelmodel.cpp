@@ -285,20 +285,45 @@ void LabelModel::setTable(QString t, QSqlDatabase *database)
 QList<QString> LabelModel::getTitleByNotebookId(int idNotebook)
 {
     QList <QString> tmpList;
-    for(int i = 0; i < model.size(); i++)
-        if(model[ i ][ ID_NOTEBOOK ].toInt() == idNotebook)
-            tmpList.append(model[ i ][ TITLE ].toString());
 
+    query.prepare("SELECT title FROM label WHERE idNotebook = :idNotebook");
+    query.bindValue(":idNotebook", idNotebook);
+    query.exec();
+
+    while(query.next())
+        tmpList.append(query.value(0).toString());
+
+    qDebug() << tmpList;
     return tmpList;
 }
 
-QList<int> LabelModel::getIdBaNotebookId(int idNotebook)
+QList<int> LabelModel::getIdByNotebookId(int idNotebook)
 {
     QList <int> tmpList;
-    for(int i = 0; i < model.size(); i++)
-        if(model[ i ][ ID_NOTEBOOK ].toInt() == idNotebook)
-            tmpList.append(model[ i ][ ID ].toInt());
 
+    query.prepare("SELECT id FROM label WHERE idNotebook = :idNotebook");
+    query.bindValue(":idNotebook", idNotebook);
+    query.exec();
+
+    while(query.next()) {
+        tmpList.append(query.value(0).toInt());
+    }
+    qDebug() << "In model: " << tmpList;
+    return tmpList;
+}
+
+QList<int> LabelModel::getIdNoteByLabelId(int id)
+{
+    QList <int> tmpList;
+
+    query.prepare("SELECT idNote FROM labels_in_note WHERE idLabel = :idLabel");
+    query.bindValue(":idLabel", id);
+    query.exec();
+
+    while (query.next()) {
+        tmpList.append(query.value(0).toInt());
+    }
+    qDebug() << tmpList;
     return tmpList;
 }
 

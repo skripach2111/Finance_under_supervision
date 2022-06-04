@@ -123,6 +123,11 @@ void NoteModel::removeRow(int row)
     model[ row ][ STATE_ROW ] = StatesRows::DELETED;
 }
 
+void NoteModel::clear()
+{
+    model.clear();
+}
+
 bool NoteModel::select()
 {
     beginResetModel();
@@ -189,6 +194,46 @@ bool NoteModel::select(int idGroup)
             record[ STATE_ROW ] = StatesRows::NOT_EDITED;
 
             model.append( record );
+
+        }while(query.next());
+
+        endInsertRows();
+    }
+
+    endResetModel();
+
+    return false;
+}
+
+bool NoteModel::selectByNotebook(int idNotebook)
+{
+    beginResetModel();
+    beginRemoveRows(createIndex(0, 0), 0, model.count());
+    while(model.count() != 0)
+        model.removeFirst();
+    endRemoveRows();
+
+    query.prepare(QString("SELECT * FROM %1 WHERE idGroup IN (SELECT id FROM category WHERE idNotebook = :idNotebook)").arg(table));
+    query.bindValue(":idNotebook", idNotebook);
+    query.exec();
+    if(query.next())
+    {
+        int row = model.count();
+        beginInsertRows( createIndex(0, 0), row, row+query.size()-1 );
+
+        DataHash record;
+        do
+        {
+            record[ ID ] = query.value( ID );
+            record[ TITLE ] = query.value( TITLE );
+            record[ DESCRIPTION ] = query.value( DESCRIPTION );
+            record[ DATE ] = query.value( DATE );
+            record[ ID_GROUP ] = query.value( ID_GROUP );
+            record[ SUM ] = query.value( SUM );
+            record[ STATE_ROW ] = StatesRows::NOT_EDITED;
+
+            model.append( record );
+            qDebug() << record;
 
         }while(query.next());
 
@@ -271,10 +316,84 @@ qreal NoteModel::getTotalSumByGroupIdAndDate(int idGroup, QDate dateBegin, QDate
     qreal sum = 0;
 
     for(int i = 0; i < model.length(); i++)
-        if(model[ i ][ ID_GROUP ] == idGroup && model[ i ][ DATE ].toDate() > dateBegin && model[ i ][ DATE ].toDate() < dateEnd && model[ i ][ SUM ].toReal() <= 0)
+        if(model[ i ][ ID_GROUP ] == idGroup && model[ i ][ DATE ].toDate() >= dateBegin && model[ i ][ DATE ].toDate() <= dateEnd && model[ i ][ SUM ].toReal() <= 0)
              sum += model[ i ][ SUM ].toReal();
 
     return sum;
+}
+
+QList<QDate> NoteModel::getListDateNotesByIdNotebook(int idNotebook, QDate dateBegin, QDate dateEnd)
+{
+    QList <QDate> resultList;
+
+    query.prepare("SELECT DISTINCT(date) FROM note WHERE idGroup IN (SELECT id FROM category WHERE idNotebook = :idNotebook)");
+    query.bindValue(":idNotebook", idNotebook);
+    query.exec();
+
+    while(query.next())
+        if(query.value(0).toDate() >= dateBegin && query.value(0).toDate() <= dateEnd)
+            resultList.append(query.value(0).toDate());
+
+    qDebug() << resultList << dateBegin << dateEnd;
+
+    return  resultList;
+}
+
+QStringList NoteModel::getListTotalPlusByDate(QList<QDate> listDate)
+{
+    QList <qreal> resultList;
+
+    for(int i = 0; i < listDate.size(); i++)
+    {
+        qreal sum = 0;
+
+        for(int j = 0; j < model.size(); j++)
+        {
+            if(model[ j ][ DATE ].toDate() == listDate[i] && model[ j ][ SUM ].toReal() > 0)
+                sum += model[ j ][ SUM ].toReal();
+        }
+
+        resultList.append(sum);
+    }
+
+    qDebug() << resultList;
+
+    QStringList list;
+
+    for(int i = 0; i < resultList.size(); i++)
+        list.append(QVariant(resultList.at(i)).toString());
+    return list;
+}
+
+QStringList NoteModel::getListTotalMinusByDate(QList<QDate> listDate)
+{
+    QList <qreal> resultList;
+
+    for(int i = 0; i < listDate.size(); i++)
+    {
+        qreal sum = 0;
+
+        for(int j = 0; j < model.size(); j++)
+        {
+            if(model[ j ][ DATE ].toDate() == listDate[i] && model[ j ][ SUM ].toReal() < 0)
+                sum += model[ j ][ SUM ].toReal();
+        }
+
+        resultList.append(sum);
+    }
+
+    QList <qreal> rlist;
+
+    for(int i = 0; i < resultList.size(); i++)
+    {
+        rlist.append(qAbs(QVariant(resultList.at(i)).toFloat()));
+    }
+
+    qDebug() << rlist;
+    QStringList list;
+    for(int i = 0; i < rlist.size(); i++)
+        list.append(QVariant(rlist.at(i)).toString());
+    return list;
 }
 
 QVariant NoteModel::getDataById(int id, Column column)

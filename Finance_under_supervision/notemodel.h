@@ -29,13 +29,21 @@ public:
     void updateRow( int row, const QString& title, const QString& description, const QDate& date, const int& idGroup, const qreal& sum );
     void removeRow(int row);
 
+    void clear();
+
     bool select();
     bool select(int idGroup);
+    bool selectByNotebook(int idNotebook);
     bool saveChanges();
     void setTable(QString t, QSqlDatabase *database);
 
     qreal getTotalSumByGroupId(int idGroup);
     qreal getTotalSumByGroupIdAndDate(int idGroup, QDate dateBegin, QDate dateEnd);
+
+    QList <QDate> getListDateNotesByIdNotebook(int idNotebook, QDate dateBegin, QDate dateEnd);
+
+    QStringList getListTotalPlusByDate(QList <QDate> listDate);
+    QStringList getListTotalMinusByDate(QList <QDate> listDate);
 
     enum Column {
         ID = 0,

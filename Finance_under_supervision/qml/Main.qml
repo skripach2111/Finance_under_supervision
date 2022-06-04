@@ -26,6 +26,9 @@ App {
 
     }
 
+    property ListModel tmpGroup: ListModel {}
+    property ListModel tmpLabel: ListModel {}
+
     NavigationStack {
         id: startNavStack
 
@@ -44,6 +47,7 @@ App {
                     core.currentNotebook = idNotebook
                     core.getTotalPlus(core.currentNotebook)
                     core.getTotalMinus(core.currentNotebook)
+                    core.selectNoteByCurrentNotebook();
                     startNavStack.visible = false
                     mainNavStack.visible = true
                 }
@@ -59,15 +63,33 @@ App {
                 ContentAddNotebook {
                     anchors.fill: parent
 
-                    groupModel: core.groupModel
-                    labelsModel: core.labelModel
+                    groupModel: tmpGroup
+                    labelsModel: tmpLabel
 
                     onClickedSave: {
-                        models.notebook.append(newNotebook)
+                        core.addNotebook(title)
+
+                        for(var i = 0; i < tmpGroup.count; i++)
+                        {
+                            core.addGroup(tmpGroup.get(i)._title, tmpGroup.get(i)._description, tmpGroup.get(i)._icon, core.getLastNotebook())
+                        }
+
+                        for(var i = 0; i < tmpLabel.count; i++)
+                        {
+                            core.addLabel(tmpLabel.get(i)._title, tmpLabel.get(i)._color, core.getLastNotebook())
+                        }
+
+                        tmpGroup.clear();
+                        tmpLabel.clear();
+
                         startNavStack.pop()
                     }
+
                     onClickedAddGroup: startNavStack.push(addGroup)
                     onClickedAddLabel: startNavStack.push(addLabels)
+
+                    onRemoveGroup: tmpGroup.remove(ind, 1)
+                    onRemoveLabel: tmpLabel.remove(ind, 1)
                 }
             }
         }
@@ -83,7 +105,12 @@ App {
 
                     imageModel: models.icons
 
-                    onClickedSave: startNavStack.pop()
+                    onClickedSave: {
+                        console.log(icon);
+                        tmpGroup.append({_title: title, _icon: icon, _description: description})
+                        tmpGroup.remove()
+                        startNavStack.pop()
+                    }
                 }
             }
         }
@@ -98,7 +125,7 @@ App {
                     anchors.fill: parent
 
                     onClickedSave: {
-                        models.labels.append(newLabel)
+                        tmpLabel.append({_title: title, _color: color})
                         startNavStack.pop()
                     }
                 }
@@ -300,6 +327,9 @@ App {
                                 core.beginDate = beginDate
                                 core.endDate = endDate
                                 navStackGraphics.push(navStackGraphics.selectGraphick)
+
+                                console.log(core.getListTotalPlusByDate())
+                                console.log(core.getListTotalMinusByDate())
                             }
                         }
                     }
@@ -314,6 +344,10 @@ App {
                         ContentGraphicsNotesPage {
                             id: grContent
                             anchors.fill: parent
+
+                            daysNumbers: core.convertListDate()
+                            plus: core.getListTotalPlusByDate()
+                            minus: core.getListTotalMinusByDate()
                         }
                     }
                 }
@@ -341,6 +375,9 @@ App {
 
                         ContentGraphicLabelPage {
                             anchors.fill: parent
+
+                            groups: core.getListLabelTitles(core.currentNotebook)
+                            plus: core.getListPlusByLabel(core.currentNotebook, core.beginDate, core.endDate)
                         }
                     }
                 }

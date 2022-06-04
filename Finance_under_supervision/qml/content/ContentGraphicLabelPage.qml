@@ -12,17 +12,18 @@ Item {
 
     function count() {
         for(var i = 0; i < groups.length; i++)
-            pieSeries.append(groups[i], plus[i])
+            pieSeries.append(groups[i] + " " + plus[i], Math.abs(plus[i]))
     }
 
-    readonly property var plus:  [2450, 1440, 3035, 1456]
-    readonly property var groups:  ["Label_1", "Label_2", "Label_3", "Label_4"]
+    property var plus:  [2450, 1440, 3035, 1456]
+    property var groups:  ["Label_1", "Label_2", "Label_3", "Label_4"]
 
     ChartView {
-        title: "Total sum:" + pieSeries.sum
+        //title: "Total sum:" + pieSeries.sum
         anchors.fill: parent
         antialiasing: true
         legend.alignment: Qt.AlignBottom
+        legend.minimumSize: width
 
         PieSeries {
             id: pieSeries

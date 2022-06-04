@@ -34,6 +34,8 @@ public:
     qreal getTotalPlusById(int id);
     qreal getTotalMinusById(int id);
 
+    int getLastId();
+
     enum Column {
         ID = 0,
         TITLE,

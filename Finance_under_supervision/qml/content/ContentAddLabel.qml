@@ -10,7 +10,7 @@ Item {
     height: 800
     width: 300
 
-    signal clickedSave(var newLabel)
+    signal clickedSave(string title, string color)
 
     AppFlickable {
         anchors.left: parent.left
@@ -66,6 +66,7 @@ Item {
                 }
             }
             AppText {
+                id: colorText
                 width: parent.width
                 text: colorView.color
             }
@@ -87,7 +88,10 @@ Item {
         verticalPadding: dp(0)
         horizontalPadding: dp(0)
 
-        onClicked: clickedSave({title: titleLabel.text, colored: colorView.color.toString()})
+        onClicked: {
+            console.log(colorView.color)
+            clickedSave(titleLabel.text, colorView.color)
+        }
     }
 
     ColorDialog {

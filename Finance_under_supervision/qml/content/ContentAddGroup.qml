@@ -13,7 +13,7 @@ Item {
 
     property var imageModel: []
 
-    signal clickedSave()
+    signal clickedSave(string title, string icon, string description)
 
     AppFlickable {
         anchors.left: parent.left
@@ -39,6 +39,7 @@ Item {
                 height: dp(150)
                 width: parent.width
                 model: imageModel
+                property var currentIcon: ""
 
                 onCurrentIndexChanged: {
                     content.text = model[currentIndex].text
@@ -54,6 +55,7 @@ Item {
 
                     function setImage(img) {
                         contentImage.source = img
+                        comIcon.currentIcon = img
                     }
 
                     anchors.fill: parent
@@ -92,6 +94,7 @@ Item {
             }
 
             AppTextField {
+                id: titleField
                 width: parent.width
             }
 
@@ -109,6 +112,7 @@ Item {
                     anchors.fill: parent
 
                     AppTextEdit {
+                        id: descriptionEdit
                         height: contentHeight > dp(150) ? contentHeight : dp(150)
                         width: parent.width
 
@@ -139,6 +143,11 @@ Item {
         verticalPadding: dp(0)
         horizontalPadding: dp(0)
 
-        onClicked: clickedSave()
+        onClicked: {
+            console.log(titleField.text)
+            console.log(comIcon.currentIcon)
+            console.log(descriptionEdit.text)
+            clickedSave(titleField.text, comIcon.currentIcon, descriptionEdit.text)
+        }
     }
 }

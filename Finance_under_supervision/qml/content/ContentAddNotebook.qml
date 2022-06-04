@@ -10,11 +10,13 @@ Item {
     height: 800
     width: 300
 
-    signal clickedSave(var newNotebook)
+    signal clickedSave(string title)
     signal clickedAddGroup()
     signal clickedAddLabel()
     signal setGroup()
     signal setLabel()
+    signal removeGroup(var ind)
+    signal removeLabel(var ind)
 
     property var groupModel
     property var labelsModel
@@ -91,6 +93,8 @@ Item {
                                 horizontalPadding: dp(0)
 
                                 flat: true
+
+                                onClicked: removeGroup(index)
                             }
                         }
 
@@ -167,8 +171,8 @@ Item {
                         clip: true
                         model: root.labelsModel
                         delegate: AppListItem {
-                            text: title
-                            textColor: colored
+                            text: _title
+                            textColor: _color
 
                             mouseArea.onClicked: setLabel()
 
@@ -189,6 +193,8 @@ Item {
                                 horizontalPadding: dp(0)
 
                                 flat: true
+
+                                onClicked: removeLabel(index)
                             }
                         }
 
@@ -261,7 +267,7 @@ Item {
         horizontalPadding: dp(0)
 
         onClicked: {
-            clickedSave({t: titleNotebook.text, d: titleNotebook.text})
+            clickedSave(titleNotebook.text)
         }
     }
 }

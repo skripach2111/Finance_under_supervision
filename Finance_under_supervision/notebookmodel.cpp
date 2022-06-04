@@ -190,6 +190,11 @@ qreal NotebookModel::getTotalMinusById(int id)
     return query.value(0).toReal();
 }
 
+int NotebookModel::getLastId()
+{
+    return model[ model.size()-1 ][ ID ].toInt();
+}
+
 QVariant NotebookModel::getDataById(int id, Column column)
 {
     for(int i = 0; i < model.size(); i++)

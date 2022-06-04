@@ -35,7 +35,8 @@ public:
     void setTable(QString t, QSqlDatabase *database);
 
     QList <QString> getTitleByNotebookId(int idNotebook);
-    QList <int> getIdBaNotebookId(int idNotebook);
+    QList <int> getIdByNotebookId(int idNotebook);
+    QList <int> getIdNoteByLabelId(int id);
 
     enum Column {
         ID = 0,
