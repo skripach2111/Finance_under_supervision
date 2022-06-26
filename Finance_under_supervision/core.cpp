@@ -61,7 +61,14 @@ void Core::addGroup(QString title, QString description, QString icon, int idNote
 {
     db.groupModel->appendRow(title, description, icon, idNotebook, true);
     db.groupModel->saveChanges();
-    db.groupModel->select();
+    db.groupModel->select(_currentNotebook);
+}
+
+void Core::removeGroup(int index)
+{
+    db.groupModel->removeRow(index);
+    db.groupModel->saveChanges();
+    db.groupModel->select(_currentNotebook);
 }
 
 void Core::selectNoteByCurrentNotebook()
@@ -99,7 +106,14 @@ void Core::addLabel(QString title, QString color, int idNotebook)
 {
     db.labelModel->appendRow(title, color, idNotebook, true);
     db.labelModel->saveChanges();
-    db.labelModel->select();
+    db.labelModel->select(_currentNotebook);
+}
+
+void Core::removeLabel(int index)
+{
+    db.labelModel->removeRow(index);
+    db.labelModel->saveChanges();
+    db.labelModel->select(_currentNotebook);
 }
 
 QList<QString> Core::getListGroupTitles(int idNotebook)

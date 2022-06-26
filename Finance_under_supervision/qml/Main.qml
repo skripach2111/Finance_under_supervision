@@ -26,8 +26,26 @@ App {
 
     }
 
-    property ListModel tmpGroup: ListModel {}
-    property ListModel tmpLabel: ListModel {}
+    property ListModel tmpGroup: ListModel {
+        onCountChanged: {
+            if(notebookUpdate)
+            {
+                core.addGroup(tmpGroup.get(0)._title, tmpGroup.get(0)._description, tmpGroup.get(0)._icon, core.currentNotebook)
+                tmpGroup.clear();
+            }
+        }
+    }
+    property ListModel tmpLabel: ListModel {
+    onCountChanged: {
+        if(notebookUpdate)
+        {
+            core.addLabel(tmpLabel.get(0)._title, tmpLabel.get(0)._color, core.currentNotebook)
+            tmpLabel.clear()
+        }
+    }
+    }
+
+    property bool notebookUpdate: false
 
     NavigationStack {
         id: startNavStack
@@ -85,8 +103,14 @@ App {
                         startNavStack.pop()
                     }
 
-                    onClickedAddGroup: startNavStack.push(addGroup)
-                    onClickedAddLabel: startNavStack.push(addLabels)
+                    onClickedAddGroup: {
+                        notebookUpdate = false
+                        startNavStack.push(addGroup)
+                    }
+                    onClickedAddLabel: {
+                        notebookUpdate = false
+                        startNavStack.push(addLabels)
+                    }
 
                     onRemoveGroup: tmpGroup.remove(ind, 1)
                     onRemoveLabel: tmpLabel.remove(ind, 1)
@@ -108,8 +132,8 @@ App {
                     onClickedSave: {
                         console.log(icon);
                         tmpGroup.append({_title: title, _icon: icon, _description: description})
-                        tmpGroup.remove()
                         startNavStack.pop()
+                        navStackNotebook.pop()
                     }
                 }
             }
@@ -127,6 +151,7 @@ App {
                     onClickedSave: {
                         tmpLabel.append({_title: title, _color: color})
                         startNavStack.pop()
+                        navStackNotebook.pop()
                     }
                 }
             }
@@ -418,13 +443,37 @@ App {
                         ContentAddNotebook {
                             anchors.fill: parent
 
+                            property ListModel removeListGroup: ListModel {}
+                            property ListModel removeListLabel: ListModel {}
+
+                            notebookTitle: core.getNotebookTitleById(core.currentNotebook)
+
                             groupModel: core.groupModel
                             labelsModel: core.labelModel
 
-                            onClickedAddGroup: navStackNotebook.push(addGroup)
-                            onClickedAddLabel: navStackNotebook.push(addLabels)
+                            onRemoveGroup: removeListGroup.append({_index: ind})
+                            onRemoveLabel: removeListLabel.append({_index: ind})
+
+                            onClickedAddGroup: {
+                                notebookUpdate = true
+                                navStackNotebook.push(addGroup)
+                            }
+                            onClickedAddLabel: {
+                                notebookUpdate = true
+                                navStackNotebook.push(addLabels)
+                            }
                             onSetGroup: navStackNotebook.push(addGroup)
                             onSetLabel: navStackNotebook.push(addLabels)
+
+                            onClickedSave: {
+                                for(var i = 0; i < removeListGroup.count; i++)
+                                    core.removeGroup(removeListGroup.get(i)._index)
+
+                                for(var i = 0; i < removeListLabel.count; i++)
+                                    core.removeLabel(removeListLabel.get(i)._index)
+
+                                navStackNotebook.pop()
+                            }
                         }
                     }
                 }

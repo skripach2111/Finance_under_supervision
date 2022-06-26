@@ -123,7 +123,7 @@ bool LabelModel::select()
         model.removeFirst();
     endRemoveRows();
 
-    query.prepare(QString("SELECT * FROM %1").arg(table));
+    query.prepare(QString("SELECT * FROM %1 WHERE flag = 1").arg(table));
     query.exec();
     if(query.next())
     {
@@ -160,7 +160,7 @@ bool LabelModel::select(int idNotebook)
         model.removeFirst();
     endRemoveRows();
 
-    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook").arg(table));
+    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook AND flag = 1").arg(table));
     query.bindValue(":idNotebook", idNotebook);
     query.exec();
     if(query.next())
@@ -198,7 +198,7 @@ bool LabelModel::select(int idNotebook, int idNote)
         model.removeFirst();
     endRemoveRows();
 
-    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook AND id IN (SELECT idLabel FROM labels_in_note WHERE idNote = :idNote)").arg(table));
+    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook AND id IN (SELECT idLabel FROM labels_in_note WHERE idNote = :idNote) AND falg = 1").arg(table));
     query.bindValue(":idNotebook", idNotebook);
     query.bindValue(":idNote", idNote);
     query.exec();

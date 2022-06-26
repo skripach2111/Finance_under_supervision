@@ -47,6 +47,7 @@ public:
     Q_INVOKABLE QString getGroupTitleById(int id);
     Q_INVOKABLE QString getGroupIconById(int id);
     Q_INVOKABLE void addGroup(QString title, QString description, QString icon, int idNotebook);
+    Q_INVOKABLE void removeGroup(int index);
 
     Q_INVOKABLE void selectNoteByCurrentNotebook();
     Q_INVOKABLE QString getNoteTitleById(int id);
@@ -56,6 +57,7 @@ public:
     Q_INVOKABLE int getNoteGroupById(int id);
 
     Q_INVOKABLE void addLabel(QString title, QString color, int idNotebook);
+    Q_INVOKABLE void removeLabel(int index);
 
     Q_INVOKABLE QList <QString> getListGroupTitles(int idNotebook);
     Q_INVOKABLE QList <qreal> getListPlusByGroup(int idNotebook, QDate beginDate, QDate endDate);

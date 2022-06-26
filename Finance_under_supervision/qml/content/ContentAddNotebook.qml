@@ -23,6 +23,8 @@ Item {
 
     property var navStack: ""
 
+    property alias notebookTitle: titleNotebook.text
+
     AppFlickable {
         anchors.left: parent.left
         anchors.top: parent.top
@@ -71,6 +73,7 @@ Item {
                         clip: true
                         model: root.groupModel
                         delegate: AppListItem {
+                            id: delegateGroup
                             text: _title
                             detailText: _description
 
@@ -94,7 +97,10 @@ Item {
 
                                 flat: true
 
-                                onClicked: removeGroup(index)
+                                onClicked: {
+                                    delegateGroup.visible = false
+                                    removeGroup(index)
+                                }
                             }
                         }
 
@@ -171,6 +177,7 @@ Item {
                         clip: true
                         model: root.labelsModel
                         delegate: AppListItem {
+                            id: delegateLabel
                             text: _title
                             textColor: _color
 
@@ -194,7 +201,10 @@ Item {
 
                                 flat: true
 
-                                onClicked: removeLabel(index)
+                                onClicked: {
+                                    delegateLabel.visible = false
+                                    removeLabel(index)
+                                }
                             }
                         }
 
