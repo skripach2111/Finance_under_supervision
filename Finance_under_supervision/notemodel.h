@@ -45,6 +45,8 @@ public:
     QStringList getListTotalPlusByDate(QList <QDate> listDate);
     QStringList getListTotalMinusByDate(QList <QDate> listDate);
 
+    int getLastId();
+
     enum Column {
         ID = 0,
         TITLE,

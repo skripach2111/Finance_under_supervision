@@ -51,6 +51,7 @@ SOURCES += main.cpp \
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
     OTHER_FILES += android/AndroidManifest.xml       android/build.gradle
+    OTHER_FILES += android/assets/assets/fus.db
 }
 
 ios {
@@ -74,3 +75,13 @@ HEADERS += \
     notebookmodel.h \
     notemodel.h \
     resultquery.h
+
+DISTFILES += \
+    qml/content/ContentInfoAboutGroup.qml \
+    qml/content/ContentSelectLabel.qml
+
+
+
+
+
+

@@ -53,6 +53,15 @@ Item {
                     text: _title
 
                     mouseArea.onClicked: clickedOpen(_id)
+                    mouseArea.onPressAndHold: nativeUtils.displayAlertSheet("Вы действительно хотите удалить дневник?", ["Да", "Нет"], false)
+
+                    Connections {
+                            target: nativeUtils
+                            onAlertSheetFinished: function (answer) {
+                              if(answer == 0)
+                                  core.removeNotebook(index+1)
+                            }
+                          }
                 }
 
                 Layout.fillHeight: true

@@ -275,6 +275,13 @@ QList<int> GroupModel::getGroupIdByIdNotebook(int idNotebook)
     return tmpList;
 }
 
+int GroupModel::getRowById(int id)
+{
+    for(int i = 0; i < model.size(); i++)
+        if(id == model[i][ID].toInt())
+            return i;
+}
+
 QVariant GroupModel::getDataById(int id, Column column)
 {
     for(int i = 0; i < model.size(); i++)

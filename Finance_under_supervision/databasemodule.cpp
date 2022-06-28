@@ -44,6 +44,12 @@ ResultQuery DatabaseModule::connect()
         noteModel->select();
         labelModel = new LabelModel(this);
         labelModel->select();
+
+        QSqlQuery qu;
+        qu.prepare("SELECT * FROM notebook");
+        qu.exec();
+        while(qu.next())
+            qDebug() << qu.value(0).toInt() << qu.value(1).toString();
         return ResultQuery(true);
     }
 
@@ -63,6 +69,15 @@ ResultQuery DatabaseModule::connect(QSqlDatabase db)
     this->db = db;
 
     return connect();
+}
+
+void DatabaseModule::addLabelInNote(int idLabel, int idNote)
+{
+    QSqlQuery qu;
+    qu.prepare("INSERT INTO labels_in_note (idLabel, idNote) VALUES (:idLabel, :idNote)");
+    qu.bindValue(":idLabel", idLabel);
+    qu.bindValue(":idNote", idNote);
+    qu.exec();
 }
 
 void DatabaseModule::disconnect()

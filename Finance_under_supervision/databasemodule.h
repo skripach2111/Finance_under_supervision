@@ -32,6 +32,8 @@ public:
     ResultQuery connect(QString dbName);
     ResultQuery connect(QSqlDatabase db);
 
+    void addLabelInNote(int idLabel, int idNote);
+
     void disconnect();
 
     NotebookModel* notebookModel;

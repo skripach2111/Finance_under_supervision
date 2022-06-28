@@ -89,6 +89,9 @@ void NotebookModel::updateRow(int row, const QString& title)
 void NotebookModel::removeRow(int row)
 {
     model[ row ][ STATE_ROW ] = StatesRows::DELETED;
+//    for(int i = 0; i < model.size(); i++)
+//        if(row == model[i][ID])
+//            model[i][STATE_ROW] = StatesRows::DELETED;
 }
 
 bool NotebookModel::select()
@@ -153,7 +156,7 @@ bool NotebookModel::saveChanges()
             else if(model[ i ][ STATE_ROW ] == StatesRows::DELETED)
             {
                 qDebug() << "DELETED";
-                query.prepare(QString("UPDATE %1 SET flag = 0 WHERE id = :id").arg(table));
+                query.prepare(QString("DELETE FROM %1 WHERE id = :id").arg(table));
                 query.bindValue(":id", model[ i ][ ID ]);
 
                 query.exec();

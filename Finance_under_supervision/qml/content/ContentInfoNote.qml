@@ -109,13 +109,13 @@ Page {
                         cellHeight: cHeight
                         cellWidth: cWidth
 
-                        model: labels
+                        model: core.labelModel
 
                         delegate: AppPaper {
                             height: dp(16)
                             width: dp(90)
 
-                            background.color: Theme.colors.tintLightColor
+                            background.color: _color
 
                             radius: 10
 
@@ -123,7 +123,7 @@ Page {
                                 anchors.centerIn: parent
 
                                 text: _title
-                                color: _color
+                                //color: _color
                             }
                         }
                     }

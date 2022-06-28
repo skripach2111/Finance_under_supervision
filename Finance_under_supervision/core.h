@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QQuickItem>
 #include <QDebug>
+#include <QStandardPaths>
 
 #include "databasemodule.h"
 
@@ -39,6 +40,8 @@ public:
     Q_INVOKABLE void getTotalMinus(int id);
     Q_INVOKABLE void getTotalPlus(int id);
 
+    Q_INVOKABLE void removeNotebook(int row);
+
     Q_INVOKABLE QString getNotebookTitleById(int id);
     Q_INVOKABLE void addNotebook(QString title);
     Q_INVOKABLE int getLastNotebook();
@@ -46,7 +49,9 @@ public:
     Q_INVOKABLE qreal getTotalSumByGroupId(int id);
     Q_INVOKABLE QString getGroupTitleById(int id);
     Q_INVOKABLE QString getGroupIconById(int id);
+    Q_INVOKABLE QString getGroupDescriptionById(int id);
     Q_INVOKABLE void addGroup(QString title, QString description, QString icon, int idNotebook);
+    Q_INVOKABLE void setGroup(QString title, QString description, QString icon);
     Q_INVOKABLE void removeGroup(int index);
 
     Q_INVOKABLE void selectNoteByCurrentNotebook();
@@ -58,6 +63,8 @@ public:
 
     Q_INVOKABLE void addLabel(QString title, QString color, int idNotebook);
     Q_INVOKABLE void removeLabel(int index);
+
+    Q_INVOKABLE void  addNote(int idGroup, QString title, QString description, qreal sum, QList <int> labelsId);
 
     Q_INVOKABLE QList <QString> getListGroupTitles(int idNotebook);
     Q_INVOKABLE QList <qreal> getListPlusByGroup(int idNotebook, QDate beginDate, QDate endDate);
@@ -71,6 +78,8 @@ public:
     Q_INVOKABLE QStringList getListTotalMinusByDate();
 
     Q_INVOKABLE QStringList convertListDate();
+
+    Q_INVOKABLE void selectLabelInCurrentNotebook();
 
     NotebookModel* notebookModel();
     GroupModel* groupModel();

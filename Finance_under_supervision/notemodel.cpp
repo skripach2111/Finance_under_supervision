@@ -136,7 +136,7 @@ bool NoteModel::select()
         model.removeFirst();
     endRemoveRows();
 
-    query.prepare(QString("SELECT * FROM %1").arg(table));
+    query.prepare(QString("SELECT * FROM %1 ORDER BY date").arg(table));
     query.exec();
     if(query.next())
     {
@@ -174,7 +174,7 @@ bool NoteModel::select(int idGroup)
         model.removeFirst();
     endRemoveRows();
 
-    query.prepare(QString("SELECT * FROM %1 WHERE idGroup = :idGroup").arg(table));
+    query.prepare(QString("SELECT * FROM %1 WHERE idGroup = :idGroup ORDER BY id DESC").arg(table));
     query.bindValue(":idGroup", idGroup);
     query.exec();
     if(query.next())
@@ -213,7 +213,7 @@ bool NoteModel::selectByNotebook(int idNotebook)
         model.removeFirst();
     endRemoveRows();
 
-    query.prepare(QString("SELECT * FROM %1 WHERE idGroup IN (SELECT id FROM category WHERE idNotebook = :idNotebook)").arg(table));
+    query.prepare(QString("SELECT * FROM %1 WHERE idGroup IN (SELECT id FROM category WHERE idNotebook = :idNotebook) ORDER BY id DESC").arg(table));
     query.bindValue(":idNotebook", idNotebook);
     query.exec();
     if(query.next())
@@ -394,6 +394,16 @@ QStringList NoteModel::getListTotalMinusByDate(QList<QDate> listDate)
     for(int i = 0; i < rlist.size(); i++)
         list.append(QVariant(rlist.at(i)).toString());
     return list;
+}
+
+int NoteModel::getLastId()
+{
+    query.prepare("SELECT id FROM note ORDER BY id DESC");
+    query.exec();
+
+    query.next();
+
+    return query.value(0).toInt();
 }
 
 QVariant NoteModel::getDataById(int id, Column column)

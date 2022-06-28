@@ -13,6 +13,11 @@ Item {
 
     property var imageModel: []
 
+    property var currentImage
+    property var currentTitle
+    property var currentDescription
+    property var currentIconTitle
+
     signal clickedSave(string title, string icon, string description)
 
     AppFlickable {
@@ -50,8 +55,16 @@ Item {
                 contentItem: AppListItem {
                     id: content
 
-                    property var title: ""
-                    property var icon: ""
+                    property var title: currentTitle
+                    property var icon: currentImage
+
+                    Component.onCompleted: {
+                        setImage(icon)
+
+                        for(var i = 0; i < imageModel.length; i++)
+                            if(imageModel[i].icon == currentImage)
+                                content.text = imageModel[i].text
+                    }
 
                     function setImage(img) {
                         contentImage.source = img
@@ -60,7 +73,7 @@ Item {
 
                     anchors.fill: parent
 
-                    text: title
+                    text: currentIconTitle
 
                     leftItem: AppImage {
                         id: contentImage
@@ -96,6 +109,8 @@ Item {
             AppTextField {
                 id: titleField
                 width: parent.width
+
+                text: currentTitle
             }
 
             AppText {
@@ -115,7 +130,7 @@ Item {
                         id: descriptionEdit
                         height: contentHeight > dp(150) ? contentHeight : dp(150)
                         width: parent.width
-
+                        text: currentDescription
                     }
 
                     Rectangle {

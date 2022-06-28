@@ -82,6 +82,7 @@ Item {
 
                 Page {
                     AppListView {
+                        id: listView
                         clip: true
                         anchors.fill: parent
                         model: groups

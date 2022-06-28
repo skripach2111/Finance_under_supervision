@@ -36,6 +36,8 @@ public:
     QList <QString> getGroupTitleByIdNotebook(int idNotebook);
     QList <int> getGroupIdByIdNotebook(int idNotebook);
 
+    int getRowById(int id);
+
     enum Column {
         ID = 0,
         TITLE,

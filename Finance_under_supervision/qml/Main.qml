@@ -9,7 +9,7 @@ import "logic"
 import com.custom 1.0
 
 App {
-
+    id: app
     // You get free licenseKeys from https://felgo.com/licenseKey
     // With a licenseKey you can:
     //  * Publish your games & apps for the app stores
@@ -26,6 +26,18 @@ App {
 
     }
 
+    signal dataUpdate()
+    function addGroupPop()
+    {
+        navStackNotebook.pop()
+    }
+
+
+    function updateAll() {
+        core.getTotalPlus(core.currentNotebook)
+        core.getTotalMinus(core.currentNotebook)
+    }
+
     property ListModel tmpGroup: ListModel {
         onCountChanged: {
             if(notebookUpdate)
@@ -36,13 +48,17 @@ App {
         }
     }
     property ListModel tmpLabel: ListModel {
-    onCountChanged: {
-        if(notebookUpdate)
-        {
-            core.addLabel(tmpLabel.get(0)._title, tmpLabel.get(0)._color, core.currentNotebook)
-            tmpLabel.clear()
+        onCountChanged: {
+            if(notebookUpdate)
+            {
+                core.addLabel(tmpLabel.get(0)._title, tmpLabel.get(0)._color, core.currentNotebook)
+                tmpLabel.clear()
+            }
         }
     }
+
+    property ListModel tmpSelectLabels: ListModel {
+
     }
 
     property bool notebookUpdate: false
@@ -106,6 +122,7 @@ App {
                     onClickedAddGroup: {
                         notebookUpdate = false
                         startNavStack.push(addGroup)
+                        //tmpSelectLabels.get()
                     }
                     onClickedAddLabel: {
                         notebookUpdate = false
@@ -133,7 +150,7 @@ App {
                         console.log(icon);
                         tmpGroup.append({_title: title, _icon: icon, _description: description})
                         startNavStack.pop()
-                        navStackNotebook.pop()
+                        //addGroupPop()
                     }
                 }
             }
@@ -151,7 +168,7 @@ App {
                     onClickedSave: {
                         tmpLabel.append({_title: title, _color: color})
                         startNavStack.pop()
-                        navStackNotebook.pop()
+                        //addGroupPop()
                     }
                 }
             }
@@ -202,7 +219,7 @@ App {
                     title: "Главная"
 
                     function setChart()
-                        {
+                    {
                         mainPage.setChart()
                     }
 
@@ -222,8 +239,6 @@ App {
                             core.currentGroup = idGroup
                             navStackMainPage.push(listNotes)
                         }
-
-
 
                     }
 
@@ -246,9 +261,58 @@ App {
                             source: "../assets/plus_white.png"
                         }
 
-                        onClicked: navStackMainPage.push(addNote)
+                        onClicked: {
+                            core.selectLabelInCurrentNotebook()
+                            navStackMainPage.push(addNote)
+                        }
                     }
 
+                }
+
+                Component {
+                    id: infoGroup
+
+                    Page {
+                        title: "Информация о группе"
+
+                        ContentInfoAboutGroup {
+                            anchors.fill: parent
+                            groupModel: core.groupModel
+                        }
+
+                        rightBarItem: TextButtonBarItem {
+                            text: "Изменить"
+                            color: Theme.colors.backgroundColor
+
+                            onClicked: navStackMainPage.push(changeGroup)
+                        }
+
+
+                    }
+                }
+
+                Component {
+                    id: changeGroup
+
+                    Page {
+                        title: "Редатирование группы"
+
+                        ContentAddGroup {
+                            anchors.fill: parent
+
+                            imageModel: models.icons
+                            currentTitle: core.getGroupTitleById(core.currentGroup)
+                            currentImage: core.getGroupIconById(core.currentGroup)
+                            currentDescription: core.getGroupDescriptionById(core.currentGroup)
+
+                            onClickedSave: {
+                                core.setGroup(title, description, icon)
+                                navStackMainPage.pop()
+                                navStackMainPage.pop()
+                                navStackMainPage.pop()
+                            }
+                        }
+                    }
                 }
 
                 Component {
@@ -261,7 +325,27 @@ App {
                             anchors.fill: parent
 
                             groupModel: core.groupModel
-                            labelModel: core.labelModel
+                            labelModel: tmpSelectLabels
+
+                            onShowLabelSelector: navStackMainPage.push(selectLabel)
+                            onNoteAdd: navStackMainPage.pop()
+                        }
+                    }
+                }
+
+                Component {
+                    id: selectLabel
+
+                    Page {
+                        title: "Выберите метку"
+
+                        ContentSelectLabel {
+                            anchors.fill: parent
+
+                            onSelectLabel: {
+                                tmpSelectLabels.append({_id: id, _title: title, _color: color})
+                                navStackMainPage.pop()
+                            }
                         }
                     }
                 }
@@ -291,14 +375,14 @@ App {
                             text: "Инфо"
                             color: Theme.colors.backgroundColor
 
-                            onClicked: navStackNotebook.push(changeNotebook)
-                          }
+                            onClicked: navStackMainPage.push(infoGroup)
+                        }
 
                         PageListNotes {
                             anchors.fill: parent
 
                             notes: core.noteModel
-                            labels: core.labelModel
+                            labels: tmpSelectLabels
 
                             onClickedNote: {
                                 core.currentNote = idNote
@@ -418,12 +502,14 @@ App {
                 Page {
                     title: "Дневник"
 
+                    Component.onCompleted: core.selectLabelInCurrentNotebook()
+
                     rightBarItem: TextButtonBarItem {
                         text: "Изменить"
                         color: Theme.colors.backgroundColor
 
                         onClicked: navStackNotebook.push(changeNotebook)
-                      }
+                    }
 
                     ContentViewNotebook {
                         anchors.fill: parent
@@ -474,6 +560,7 @@ App {
 
                                 navStackNotebook.pop()
                             }
+
                         }
                     }
                 }

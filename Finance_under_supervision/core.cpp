@@ -4,7 +4,23 @@ Core::Core(QObject *parent)
 {
     this->setParent(parent);
 
-    if(db.connect("../fus.db").flag)
+
+    //QString path1 = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+    //QString path = path1 +"/fus/fus.db";
+    //qDebug() << path;
+
+
+
+    QString dbName;
+
+      dbName = "fus.db";//"/storage/emulated/0/Android/data/com.vsk.Financeundersupervision/files/fus.db";//"assets/fus.db";
+      //dbName = QStandardPaths::writableLocation(QStandardPaths::StandardLocation()) + "fus.db";
+      qDebug() << QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
+      qDebug() << QStandardPaths::writableLocation(QStandardPaths::StandardLocation());
+      qDebug() << QStandardPaths::displayName(QStandardPaths::StandardLocation());
+      qDebug() << QStandardPaths::displayName(QStandardPaths::DataLocation);
+
+    if(db.connect(dbName).flag)
         qDebug() << "Database connected!";
     else
         qDebug() << "Error connect to database!";
@@ -23,6 +39,13 @@ void Core::getTotalPlus(int id)
 {
     _totalPlus = db.notebookModel->getTotalPlusById(id);
     emit totalPlusChanged();
+}
+
+void Core::removeNotebook(int row)
+{
+    db.notebookModel->removeRow(row);
+    db.notebookModel->saveChanges();
+    db.notebookModel->select();
 }
 
 QString Core::getNotebookTitleById(int id)
@@ -57,11 +80,25 @@ QString Core::getGroupIconById(int id)
     return db.groupModel->getDataById(id, GroupModel::Column::ICON).toString();
 }
 
+QString Core::getGroupDescriptionById(int id)
+{
+    return db.groupModel->getDataById(id, GroupModel::Column::DESCRIPTION).toString();
+}
+
 void Core::addGroup(QString title, QString description, QString icon, int idNotebook)
 {
     db.groupModel->appendRow(title, description, icon, idNotebook, true);
     db.groupModel->saveChanges();
     db.groupModel->select(_currentNotebook);
+}
+
+void Core::setGroup(QString title, QString description, QString icon)
+{
+    db.groupModel->updateRow(db.groupModel->getRowById(_currentGroup), title, description, icon, _currentNotebook, 1);
+    db.groupModel->saveChanges();
+    db.noteModel->selectByNotebook(_currentNotebook);
+    db.groupModel->select(_currentNotebook);
+    //db.noteModel->select(_currentGroup);
 }
 
 void Core::removeGroup(int index)
@@ -114,6 +151,18 @@ void Core::removeLabel(int index)
     db.labelModel->removeRow(index);
     db.labelModel->saveChanges();
     db.labelModel->select(_currentNotebook);
+}
+
+void Core::addNote(int idGroup, QString title, QString description, qreal sum, QList<int> labelsId)
+{
+    db.noteModel->appendRow(title, description, QDate::currentDate(), idGroup, sum);
+    db.noteModel->saveChanges();
+    int lastNote = db.noteModel->getLastId();
+    for(int i = 0; i < labelsId.size(); i++)
+        db.addLabelInNote(labelsId[i], lastNote);
+    selectNoteByCurrentNotebook();
+    db.groupModel->select(_currentNotebook);
+
 }
 
 QList<QString> Core::getListGroupTitles(int idNotebook)
@@ -192,6 +241,11 @@ QStringList Core::convertListDate()
         listDateString.append(listDate.at(i).toString());
 
     return  listDateString;
+}
+
+void Core::selectLabelInCurrentNotebook()
+{
+    db.labelModel->select(_currentNotebook);
 }
 
 NotebookModel* Core::notebookModel()

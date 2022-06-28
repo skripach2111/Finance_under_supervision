@@ -198,7 +198,7 @@ bool LabelModel::select(int idNotebook, int idNote)
         model.removeFirst();
     endRemoveRows();
 
-    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook AND id IN (SELECT idLabel FROM labels_in_note WHERE idNote = :idNote) AND falg = 1").arg(table));
+    query.prepare(QString("SELECT * FROM %1 WHERE idNotebook = :idNotebook AND id IN (SELECT idLabel FROM labels_in_note WHERE idNote = :idNote) AND flag = 1").arg(table));
     query.bindValue(":idNotebook", idNotebook);
     query.bindValue(":idNote", idNote);
     query.exec();
